@@ -1,0 +1,211 @@
+<div class="sidebar-header">
+    <h4 class="mb-0 d-flex align-items-center">
+        <i class="fas fa-calculator me-1"></i>
+        <a href="{{ url_for('index') }}" class="text-reset text-decoration-none">Matrix Tools</a>
+    </h4>
+</div>
+
+<!-- Search Bar -->
+<div class="sidebar-search">
+    <div class="search-container">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" id="sidebarSearch-{{ sidebar_id_suffix }}" class="search-input" placeholder="Cerca algoritmi..." autocomplete="off" oninput="handleSearchInput('{{ sidebar_id_suffix }}', event)">
+        <div class="search-clear" id="searchClear-{{ sidebar_id_suffix }}" style="display: none;" onclick="clearSearch('{{ sidebar_id_suffix }}', event)">
+            <i class="fas fa-times"></i>
+        </div>
+    </div>
+    <div class="search-results" id="searchResults-{{ sidebar_id_suffix }}" style="display: none;"></div>
+</div>
+
+<div class="sidebar-content">
+    <!-- Sidebar: Sezione Quaderno -->
+    <div class="notebook-section">
+        <button
+            class="notebook-button"
+            onclick="openNotebook()"
+            title="Apri Quaderno"
+        >
+            <i class="fas fa-book notebook-icon"></i>
+            <span class="notebook-text">Quaderno</span>
+            <span class="notebook-count" id="exercise-count-{{ sidebar_id_suffix }}">
+                <script>
+                    document.write(
+                    JSON.parse(localStorage.getItem("mathNotebook") || "[]").length
+                    );
+                </script>
+            </span>
+        </button>
+    </div>
+
+    <!-- Tutte le sezioni categoria -->
+    <div class="category-section">
+        <button class="category-header" onclick="toggleSection('controls{{ sidebar_id_suffix }}', event)">
+            <div class="category-title">
+                <i class="fas fa-cogs category-icon"></i>
+                <span>Teoria dei Controlli</span>
+            </div>
+            <i class="fas fa-chevron-down chevron-icon"></i>
+        </button>
+        <div class="algorithm-container collapsed" id="controls{{ sidebar_id_suffix }}">
+            <ul class="algorithm-list">
+                <li>
+                    <a href="linearizzazione.html"
+                       class="algorithm-link {% if request.path.endswith('linearizzazione.html') %}active{% endif %}"
+                       onclick="clearSearch('{{ sidebar_id_suffix }}', event)">
+                        <i class="fas fa-project-diagram me-2"></i>
+                        <span>Linearizzazione</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="decomposizione-spettrale.html"
+                       class="algorithm-link {% if request.path.endswith('decomposizione-spettrale.html') %}active{% endif %}"
+                       onclick="clearSearch('{{ sidebar_id_suffix }}', event)">
+                        <i class="fas fa-braille me-2"></i>
+                        <span>Decomposizione Spettrale</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="category-section">
+        <button class="category-header" onclick="toggleSection('algebra{{ sidebar_id_suffix }}', event)">
+            <div class="category-title">
+                <i class="fas fa-square-root-alt category-icon"></i>
+                <span>Algebra e Logica</span>
+            </div>
+            <i class="fas fa-chevron-down chevron-icon"></i>
+        </button>
+        <div class="algorithm-container collapsed" id="algebra{{ sidebar_id_suffix }}">
+            <ul class="algorithm-list">
+                <li>
+                    <a href="potenze-modulari.html"
+                       class="algorithm-link {% if request.path.endswith('potenze-modulari.html') %}active{% endif %}"
+                       onclick="clearSearch('{{ sidebar_id_suffix }}', event)">
+                        <i class="fas fa-divide me-2"></i>
+                        <span>Potenze Modulari</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="diagramma-hasse.html"
+                       class="algorithm-link {% if request.path.endswith('diagramma-hasse.html') %}active{% endif %}"
+                       onclick="clearSearch('{{ sidebar_id_suffix }}', event)">
+                        <i class="fas fa-cubes me-2"></i>
+                        <span>Diagramma di Hasse</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="polinomi-booleani.html"
+                       class="algorithm-link {% if request.path.endswith('polinomi-booleani.html') %}active{% endif %}"
+                       onclick="clearSearch('{{ sidebar_id_suffix }}', event)">
+                        <i class="fas fa-project-diagram me-2"></i>
+                        <span>Polinomi Booleani</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="teorema-cinese-resto.html"
+                       class="algorithm-link {% if request.path.endswith('teorema-cinese-resto.html') %}active{% endif %}"
+                       onclick="clearSearch('{{ sidebar_id_suffix }}', event)">
+                        <i class="fas fa-chess-board me-2"></i>
+                        <span>Teorema Cinese del Resto</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="identita-bezout.html"
+                       class="algorithm-link {% if request.path.endswith('identita-bezout.html') %}active{% endif %}"
+                       onclick="clearSearch('{{ sidebar_id_suffix }}', event)">
+                        <i class="fas fa-equals me-2"></i>
+                        <span>Identità di Bézout</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="category-section">
+        <button class="category-header" onclick="toggleSection('linearalgebra{{ sidebar_id_suffix }}', event)">
+            <div class="category-title">
+                <i class="fas fa-border-all category-icon"></i>
+                <span>Algebra Lineare</span>
+            </div>
+            <i class="fas fa-chevron-down chevron-icon"></i>
+        </button>
+        <div class="algorithm-container collapsed" id="linearalgebra{{ sidebar_id_suffix }}">
+            <ul class="algorithm-list">
+                <li>
+                    <a href="determinante-laplace.html"
+                       class="algorithm-link {% if request.path.endswith('determinante-laplace.html') %}active{% endif %}"
+                       onclick="clearSearch('{{ sidebar_id_suffix }}', event)">
+                        <i class="fas fa-dice-four me-2"></i>
+                        <span>Determinante con Laplace</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="autovalori-autovettori.html"
+                       class="algorithm-link {% if request.path.endswith('autovalori-autovettori.html') %}active{% endif %}"
+                       onclick="clearSearch('{{ sidebar_id_suffix }}', event)">
+                        <i class="fas fa-cubes me-2"></i>
+                        <span>Autovalori e Autovettori</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="sistemi-lineari.html"
+                       class="algorithm-link {% if request.path.endswith('sistemi-lineari.html') %}active{% endif %}"
+                       onclick="clearSearch('{{ sidebar_id_suffix }}', event)">
+                        <i class="fas fa-equals me-2"></i>
+                        <span>Sistemi Lineari</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="category-section">
+        <button class="category-header" onclick="toggleSection('ricercaoperativa{{ sidebar_id_suffix }}', event)">
+            <div class="category-title">
+                <i class="fas fa-chart-line category-icon"></i>
+                <span>Ricerca Operativa</span>
+            </div>
+            <i class="fas fa-chevron-down chevron-icon"></i>
+        </button>
+        <div class="algorithm-container collapsed" id="ricercaoperativa{{ sidebar_id_suffix }}">
+            <ul class="algorithm-list">
+                <li>
+                    <a href="simplesso.html"
+                       class="algorithm-link {% if request.path.endswith('simplesso.html') %}active{% endif %}"
+                       onclick="clearSearch('{{ sidebar_id_suffix }}', event)">
+                        <i class="fas fa-table me-2"></i>
+                        <span>Metodo del Simplesso</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="condizioni-complementari.html"
+                       class="algorithm-link {% if request.path.endswith('condizioni-complementari.html') %}active{% endif %}"
+                       onclick="clearSearch('{{ sidebar_id_suffix }}', event)">
+                        <i class="fas fa-handshake me-2"></i>
+                        <span>Condizioni di Complementarità</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="category-section">
+        <button class="category-header" onclick="toggleSection('analisi{{ sidebar_id_suffix }}', event)">
+            <div class="category-title">
+                <i class="fas fa-chart-line category-icon"></i>
+                <span>Analisi Matematica</span>
+            </div>
+            <i class="fas fa-chevron-down chevron-icon"></i>
+        </button>
+        <div class="algorithm-container collapsed" id="analisi{{ sidebar_id_suffix }}">
+            <ul class="algorithm-list">
+                <li>
+                    <a href="studio-funzione.html"
+                       class="algorithm-link {% if request.path.endswith('studio-funzione.html') %}active{% endif %}"
+                       onclick="clearSearch('{{ sidebar_id_suffix }}', event)">
+                        <i class="fas fa-wave-square me-2"></i>
+                        <span>Studio di Funzione</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

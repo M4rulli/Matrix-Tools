@@ -1,0 +1,243 @@
+{% extends "layout.html" %}
+
+{% block topbar_title %}
+<h2 class="navbar-brand mb-0 fw-bold">
+    Polinomi Booleani
+</h2>
+{% endblock %}
+
+{% block algorithm_content %}
+<style>
+  .math-input { font-size: 22px; display: inline-block; margin: 0 auto; }
+  .step-title { margin-top: 1em; }
+  .centered-math { text-align: center; }
+  .rotate-icon { transition: transform 0.3s ease; }
+</style>
+
+<div class="row">
+  <!-- Card di Input -->
+  <div class="col-12 mb-4">
+    <div class="card calculator-card shadow-sm">
+      <div class="card-header bg-primary text-white">
+        <h5 class="card-title mb-0">
+          <i class="fas fa-edit me-2"></i>Input
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="mb-3">
+          <button id="toggleDescrizione" class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2"
+                  type="button" data-bs-toggle="collapse" data-bs-target="#descrizioneBooleani"
+                  aria-expanded="false" aria-controls="descrizioneBooleani">
+            <i id="descrizioneIcon" class="fas fa-chevron-down rotate-icon transition"></i>
+            <span id="descrizioneText">Mostra descrizione</span>
+          </button>
+        </div>
+        <div id="descrizioneBooleani" class="collapse mb-3">
+          <div class="card card-body bg-light border mt-2">
+            <p class="text-muted">
+              In un’algebra di Boole \( B \), una funzione booleana è una funzione $f : \{0,1\}^n \to \{0,1\}$. L’insieme di tutte le funzioni booleane a \( n \) variabili si indica con:
+              \[
+              F_n(B) = \{ f : B^n \to B \}, \quad \text{dove } B = \{0, 1\}.
+              \]
+              Un <strong>polinomio booleano</strong> è una particolare funzione booleana costruita ricorsivamente a partire dalle variabili \( x_1, \dots, x_n \), dai valori costanti \( 0 \) e \( 1 \), e dalle operazioni logiche AND (\( \land \)), OR (\( \lor \)) e NOT (\( '\)). Ogni polinomio booleano può essere riscritto in forme diverse ma logicamente equivalenti. In particolare, si possono ottenere:
+              <ul class="text-muted">
+                <li><strong>FND</strong>: la <em>forma normale disgiuntiva</em>, che raccoglie tutti i mintermini per cui la funzione vale 1.</li>
+                <li><strong>STIP</strong>: la <em>somma di tutti gli implicanti primi</em>, che comprende tutti i prodotti essenziali e non essenziali.</li>
+                <li><strong>FM</strong>: la <em>forma minimale</em>, ottenuta semplificando la funzione algebricamente per ottenere il numero minimo di termini.</li>
+              </ul>
+            </p>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label for="varCountSelect" class="form-label fw-semibold">Numero di variabili:</label>
+          <select id="varCountSelect" class="form-select">
+            <option value="2">2</option>
+            <option value="3" selected>3</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="exprField" class="form-label">Espressione:</label>
+          <math-field id="exprField"
+                      delete-mode="off"
+                      default-mode="math"
+                      read-only="partial"
+                      class="math-input"
+                      style="width:100%;">
+            P(x,y,z)=\placeholder[expr]{}
+          </math-field>
+        </div>
+        <div class="form-text mb-3" style="font-size:0.85rem;">
+          Puoi scrivere il polinomio usando <strong>\(\land\), \(\lor\), \(' \)</strong> digitando <code>a</code>, <code>o</code> e <code>'</code> o <code>n</code>. Soltanto le parentesi tonde sono ammesse.
+        </div>
+        <div class="text-center mt-3">
+          <button id="dnfButton" onclick="analizzaPolinomio()" class="btn btn-primary btn-sm px-3">
+            <span id="dnfButtonIcon"><i class="fas fa-play me-2"></i></span>
+            Analizza Polinomio
+          </button>
+          <button onclick="resetDNF()" class="btn btn-secondary btn-sm px-3 ms-1">
+            <i class="fas fa-eraser me-2"></i>Pulisci
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card di Output -->
+  <div class="col-12">
+    <div class="card output-card shadow-sm">
+      <div class="card-header bg-success text-white">
+        <h5 class="card-title mb-0">
+          <i class="fas fa-chart-line me-2"></i>Output
+        </h5>
+      </div>
+      <div class="card-body" id="output">
+        <div class="empty-state text-center text-muted py-5">
+          <i class="fas fa-project-diagram fa-3x mb-3 opacity-50"></i>
+          <h6>Pronto</h6>
+          <p class="small">Inserisci un’espressione.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function analizzaPolinomio() {
+  const varSelect = document.getElementById('varCountSelect');
+  const nVars = parseInt(varSelect.value, 10);
+
+  window.__scrollAfterResult = true;
+  const buttonIcon = document.getElementById("dnfButtonIcon");
+  buttonIcon.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>`;
+  const output = document.getElementById('output');
+  const fmt = 'logical';
+  const expr = window.exprField.getPromptValue("expr")?.trim();
+
+  if (!expr) {
+    output.innerHTML = createErrorAlert("Inserisci un'espressione booleana.");
+    MathJax.typesetPromise([output]);
+    return;
+  }
+  output.innerHTML = `<div class="text-center my-3">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Calcolo...</span>
+    </div>
+  </div>`;
+  fetch('/api/polinomi-booleani', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ polinomio: expr, n_vars: nVars })
+  })
+  .then(r => r.json())
+  .then(res => {
+    if (!res.success) {
+      output.innerHTML = createErrorAlert(res.error);
+    } else {
+      const varNames = ['x', 'y', 'z'].slice(0, nVars).join(',');
+      let exprLatex = `P(${varNames}) = ${expr}`;
+      // Normalizza double prime per lo step 0
+      exprLatex = exprLatex
+        .replace(/\\doubleprime/g, "''")
+        .replace(/\^\{\\prime\\prime\}/g, "''");
+      let latexSteps = `<p class="step-title"><b>0)</b> Polinomio inserito:</p>
+<p class="centered-math">\\[ ${exprLatex} \\]</p>`;
+
+      if (Array.isArray(res.latex)) {
+        latexSteps += res.latex.map((step, idx) => `
+    <p class="step-title"><b>${idx + 1})</b> ${step.title}</p>
+    <p class="centered-math">\\[${step.content}\\]</p>
+  `).join('');
+      }
+
+      output.innerHTML = `<div class="result-section">${latexSteps}</div>`;
+      output.dataset.latex = latexSteps;
+      
+      const payload = {
+          algorithm: 'Polinomio Booleano',
+          input: expr,
+          htmlOutput: output.innerHTML,   // HTML completo per GUI/PDF
+          output: latexSteps,             // compatibilità con saveToNotebook
+          outputLatex: latexSteps,        // per esportazione .tex
+          rawData: res
+      };
+
+      window.currentExercise = payload;
+      injectSaveButton(
+          output.querySelector('.result-section'),
+          payload
+      );
+      
+      MathJax.typesetPromise([output]).then(scrollToOutput);
+      buttonIcon.innerHTML = `<i class="fas fa-play me-2"></i>`;
+    }
+  })
+  .catch(err => {
+    output.innerHTML = createErrorAlert(err.message);
+    MathJax.typesetPromise([output]).then(scrollToOutput);
+  });
+}
+
+function resetDNF() {
+  const n = varSelect.value;
+  const vars = Array.from({length: n}, (_, i) => ['x','y','z'][i]).join(',');
+  window.exprField.setValue(`P(${vars})=\\placeholder[expr]{}`);
+  document.getElementById('output').innerHTML = `
+    <div class="empty-state text-center text-muted py-5">
+      <i class="fas fa-project-diagram fa-3x mb-3 opacity-50"></i>
+      <h6>Pronto</h6>
+      <p class="small">Inserisci un’espressione e premi “Analizza Polinomio”.</p>
+    </div>
+  `;
+}
+
+function createErrorAlert(msg) {
+  return `
+    <div class="alert alert-danger">
+      <i class="fas fa-exclamation-triangle me-2"></i>
+      <strong>Errore:</strong> ${msg}
+    </div>`;
+}
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  window.exprField = document.getElementById('exprField');
+  window.exprField.inlineShortcuts = {
+    ...window.exprField.inlineShortcuts,
+    'a': '\\land',
+    'o': '\\lor',
+    'ox': '\\lor x',
+    '!': '\\overline{\\placeholder{}}',
+    'n': "'"
+  };
+  const descrCollapse = document.getElementById('descrizioneBooleani');
+  const descrText = document.getElementById('descrizioneText');
+  const descrIcon = document.getElementById('descrizioneIcon');
+  descrCollapse.addEventListener('hide.bs.collapse', () => {
+    descrText.textContent = 'Mostra descrizione';
+    descrIcon.classList.remove('fa-chevron-up');
+    descrIcon.classList.add('fa-chevron-down');
+  });
+  descrCollapse.addEventListener('show.bs.collapse', () => {
+    descrText.textContent = 'Nascondi descrizione';
+    descrIcon.classList.remove('fa-chevron-down');
+    descrIcon.classList.add('fa-chevron-up');
+  });
+});
+
+// Initialize variable-count selector and update placeholder template
+const varSelect = document.getElementById('varCountSelect');
+varSelect.addEventListener('change', (e) => {
+  const n = e.target.value;
+  const vars = Array.from({length: n}, (_, i) => ['x','y','z'][i]).join(',');
+  window.exprField.setValue(`P(${vars})=\\placeholder[expr]{}`);
+});
+
+function scrollToOutput() {
+  if (window.__scrollAfterResult) {
+    document.querySelector('.output-card').scrollIntoView({ behavior: 'smooth' });
+    window.__scrollAfterResult = false;
+  }
+}
+</script>
+
+<script src="{{ url_for('static', filename='js/anti-autoscroll.js') }}"></script>
+{% endblock %}

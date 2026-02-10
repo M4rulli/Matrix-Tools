@@ -10,6 +10,7 @@ from .algerba_lineare.sistemi_lineari import syslin_bp
 
 from .controlli.linearizzazione import linearizzazione_bp
 from .controlli.decomposizione_spettrale import spectral_bp
+from .controlli.equazioni_differenziali import equazioni_differenziali_bp
 
 from .ricerca_operativa.simplesso import simplesso_bp
 from .ricerca_operativa.condizioni_complementari import cc_bp
@@ -23,6 +24,7 @@ def register_routes(app):
     app.register_blueprint(polinomi_booleani_bp)
     app.register_blueprint(linearizzazione_bp)
     app.register_blueprint(spectral_bp)
+    app.register_blueprint(equazioni_differenziali_bp)
     app.register_blueprint(teorema_cinese_resto_bp)
     app.register_blueprint(identita_bezout_bp)
     app.register_blueprint(det_laplace_bp)

@@ -18,6 +18,10 @@ def linearizzazione():
 def decomposizione():
     return render_template("controlli/decomposizione-spettrale.html")
 
+@app.route("/equazioni-differenziali.html")
+def equazioni_differenziali():
+    return render_template("controlli/equazioni-differenziali.html")
+
 
 @app.route("/potenze-modulari.html")
 def potenze_modulari():

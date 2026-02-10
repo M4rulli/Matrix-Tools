@@ -1,3 +1,62 @@
+def normalize_latex_like(expr: str) -> str:
+    """
+    Normalizza una sintassi LaTeX‑like controllata in sintassi SymPy‑style.
+    Supporta funzioni elementari per E.D. lineari a coefficienti costanti.
+    """
+    if not isinstance(expr, str):
+        return expr
+
+    # Funzioni elementari (LaTeX → SymPy)
+    replacements = {
+        r"\sin": "sin",
+        r"\cos": "cos",
+        r"\tan": "tan",
+        r"\exp": "exp",
+        r"\ln": "log",
+        r"\log": "log",
+        r"\pi": "pi",
+    }
+    for k, v in replacements.items():
+        expr = expr.replace(k, v)
+
+    # Frazioni LaTeX: \frac{a}{b} -> (a)/(b)
+    expr = re.sub(r'\\frac\{([^}]*)\}\{([^}]*)\}', r'(\1)/(\2)', expr)
+
+    # Frazioni compatte: \frac12 -> 1/2
+    expr = re.sub(r'\\frac\s*([0-9]+)\s*([0-9]+)', r'\1/\2', expr)
+
+    # Costanti e simboli
+    expr = expr.replace("π", "pi")
+
+    # Operatori
+    expr = expr.replace(r"\cdot", "*")
+    expr = expr.replace("^", "**")
+
+    # Parentesi LaTeX
+    expr = expr.replace(r"\left", "")
+    expr = expr.replace(r"\right", "")
+    expr = expr.replace("{", "(").replace("}", ")")
+
+    # Moltiplicazioni implicite tra parentesi: )(  -> )*(
+    expr = re.sub(r'\)\s*\(', r')*(', expr)
+
+    # Inserisce parentesi automatiche: cos t → cos(t), exp -t → exp(-t)
+    expr = re.sub(r'\b(sin|cos|tan|exp|log)\s+([a-zA-Z0-9\-\+]+)', r'\1(\2)', expr)
+
+    # (d±k)(...)y -> (d±k)(...)*y
+    expr = re.sub(r'\)\s*y\b', r')*y', expr)
+
+    # Rimuove spazi inutili
+    expr = expr.replace(" ", "")
+
+    # Moltiplicazione implicita numero-lettera: 1/2t -> 1/2*t, 2t -> 2*t
+    expr = re.sub(r'(\d)([a-zA-Z])', r'\1*\2', expr)
+
+    # Moltiplicazione implicita parentesi-lettera: )(t) o )t -> )*t (generico)
+    expr = re.sub(r'\)([a-zA-Z])', r')*\1', expr)
+
+    print("[DEBUG][normalize_latex_like] ->", expr)
+    return expr
 from flask import Blueprint, request, jsonify
 import sympy as sp
 from sympy import (
@@ -66,81 +125,103 @@ def get_annichilatore(rhs_expr):
     per un termine u(t) qualsiasi, in base alla tabella continua.
     Se u(t)=u1+u2+..., torna il prodotto dei singoli fattori.
     """
-    t, Δ = sp.symbols("t Δ")
+    # Use only 'd' as the internal operator. Δ is used only for LaTeX output.
+    t, d = sp.symbols("t d")
     a, b, n = sp.Wild('a'), sp.Wild('b'), sp.Wild('n')
 
     def ann_term(term):
-        # Rimuove un coefficiente numerico iniziale (positivo o negativo)
+        # Remove a numeric coefficient at the beginning (positive or negative)
         coeff, core = term.as_independent(t, as_Add=False)
         if coeff != 1:
             term = core
         if term.could_extract_minus_sign():
             term = -term
-        # costante 1
+        # constant 1
         if term == 1:
-            return Δ
-        # termine lineare t   (k = 1  →  Δ^{1+1} = Δ² )
+            return d
+        # linear term t   (k = 1  →  d^{1+1} = d² )
         if term == t:
-            return Δ**2
-        # polinomio t^k
+            return d**2
+        # polynomial t^k
         if term.is_Pow and term.base == t and term.exp.is_Integer and term.exp >= 0:
             k = int(term.exp)
-            return Δ**(k + 1)
+            return d**(k + 1)
         # e^{at} * t^k
         m = term.match(t**n * sp.exp(a * t))
         if m and m[n].is_Integer and m[n] >= 0:
             k = int(m[n])
-            A = (Δ - m[a])**(k + 1)
+            A = (d - m[a])**(k + 1)
             return A
         # e^{at}
         m = term.match(sp.exp(a * t))
         if m:
-            return Δ - m[a]
+            return d - m[a]
         # cos(bt) / sin(bt) * t^k
         for trig in (sp.cos, sp.sin):
             m = term.match(t**n * trig(b * t))
             if m and m[n].is_Integer and m[n] >= 0:
                 k = int(m[n])
-                return (Δ**2 + m[b]**2)**(k + 1)
+                return (d**2 + m[b]**2)**(k + 1)
             m = term.match(trig(b * t))
             if m:
-                return Δ**2 + m[b]**2
+                return d**2 + m[b]**2
         # e^{at} cos(bt) / sin(bt) * t^k
         for trig in (sp.cos, sp.sin):
             m = term.match(t**n * sp.exp(a*t) * trig(b*t))
             if m and m[n].is_Integer and m[n] >= 0:
                 k = int(m[n])
-                return ((Δ - m[a])**2 + m[b]**2)**(k + 1)
+                return ((d - m[a])**2 + m[b]**2)**(k + 1)
             m = term.match(sp.exp(a*t) * trig(b*t))
             if m:
-                return (Δ - m[a])**2 + m[b]**2
-        return None  # non riconosciuto
+                return (d - m[a])**2 + m[b]**2
+        return None  # not recognized
 
-    # scompone u(t) in somma di addendi
+    # decompose u(t) into sum of addends
     factors = []
     for addend in rhs_expr.as_ordered_terms():
         A_i = ann_term(addend)
         if A_i is None:
             return r"\text{Non determinato automaticamente}"
-        factors.append(A_i)   # mantieni la forma fattorizzata
+        factors.append(A_i)   # keep factored form
 
-    # prodotto di tutti i fattori
-    A_total = sp.Mul(*factors, evaluate=False)   # prodotto già in forma fattorizzata
-    return A_total, sp.latex(A_total)
+    # product of all factors (keep factored form for internal logic)
+    A_total = sp.Mul(*factors, evaluate=False)
+
+    # For LaTeX only: simplify obvious products (e.g. d*d**2 -> d**3),
+    # but do NOT change the internal A_total used for computations.
+    A_show = sp.simplify(A_total)
+
+    latex_in_Delta = sp.latex(A_show).replace("d", r"\Delta")
+    return A_total, latex_in_Delta
 
 
 @equazioni_differenziali_bp.route('/api/equazioni_differenziali', methods=['POST'])
 def api_equazione_differenziale():
     data = request.get_json()
-    equation = data.get("equazione", "")
-    if not equation.strip():
-        return jsonify({"success": False, "error": "Nessuna equazione differenziale fornita."})
 
-    result = solve_differential_equation(equation)
+    equation = data.get("equazione", "")
+    condizioni = data.get("condizioniIniziali", [])
+
+    print("[DEBUG] condizioniIniziali ricevute:", condizioni)
+
+    if not equation.strip():
+        return jsonify({
+            "success": False,
+            "error": "Nessuna equazione differenziale fornita."
+        })
+
+    result = solve_differential_equation(
+        equation,
+        condizioni_iniziali=condizioni
+    )
+
     return jsonify(result)
 
 
 def normalize_derivatives(equation_str):
+    # Replace all Unicode Δ (and LaTeX \Delta) with ASCII d for internal logic
+    equation_str = equation_str.replace(r"\Delta", "Δ")
+    equation_str = equation_str.replace("Δ", "d")
     # Se la forma è semplicemente "d^n" o "d**n", converti in forma completa
     match = re.match(r'^\s*d\^(\d+)\s*$', equation_str)
     if match:
@@ -158,13 +239,7 @@ def normalize_derivatives(equation_str):
     # ------------------------------------------------------------------
     #  Gestione dell'operatore Δ (U+0394) inteso come derivata d/dt
     # ------------------------------------------------------------------
-    # 1)  Δ^n  oppure  Δ**n   davanti a y  ⇒  d^n y / dt^n
-    equation_str = re.sub(r'Δ\^(\d+)\s*y',  r'd^\1y/dt^\1',  equation_str)
-    equation_str = re.sub(r'Δ\*\*(\d+)\s*y', r'd**\1y/dt**\1', equation_str)
-
-    # 2)  Δ y   o semplicemente Δy  ⇒  dy/dt   (prima derivata)
-    equation_str = re.sub(r'Δ\s*y',  r'dy/dt',  equation_str)
-    equation_str = re.sub(r'Δy',     r'dy/dt',  equation_str)
+    # (No Δ logic remains; all Δ have become d)
 
     patterns = [
         (r'd10y\s*/\s*dt10', 'Derivative(y, (t, 10))'),
@@ -185,12 +260,20 @@ def normalize_derivatives(equation_str):
         equation_str = re.sub(pattern, replacement, equation_str)
     return equation_str
 
-def solve_differential_equation(equation_str):
+def solve_differential_equation(equation_str, condizioni_iniziali=None):
     try:
         latex_steps = []
         t = symbols('t')
         y = Function('y')(t)
 
+        # --------------------------------------------------
+        # Normalizzazione input condizioni iniziali
+        # --------------------------------------------------
+        if condizioni_iniziali is None:
+            condizioni_iniziali = []
+
+        # --------------------------------------------------
+        # Normalize all \Delta (LaTeX) and Δ (Unicode) to d, then parse
         equation_str = normalize_derivatives(equation_str)
         print("[DEBUG] Equazione normalizzata:", equation_str)
 
@@ -203,14 +286,41 @@ def solve_differential_equation(equation_str):
             'd': sp.Symbol('d'),
             'Derivative': Derivative,
             'exp': exp, 'cos': cos, 'sin': sin,
-            'e': exp(1)
+            'e': exp(1),
+            'pi': sp.pi,
+            'log': sp.log,
         }
 
         lhs_str, rhs_str = equation_str.split('=', 1)
+
+        # Normalizza ENTRAMBI i lati (LaTeX → SymPy)
+        lhs_str = normalize_latex_like(lhs_str)
+        rhs_str = normalize_latex_like(rhs_str)
+
         lhs_expr = parse_expr(lhs_str.strip(), transformations=transformations, local_dict=local_dict)
         rhs_expr = parse_expr(rhs_str.strip(), transformations=transformations, local_dict=local_dict)
         print("[DEBUG] LHS parsed:", lhs_expr)
         print("[DEBUG] RHS parsed:", rhs_expr)
+
+        # --------------------------------------------------
+        # Estrai P(d) dal lato sinistro PRIMA della conversione in Derivative
+        # --------------------------------------------------
+        d_sym = sp.Symbol("d")
+        P_operator = lhs_expr
+
+        # rimuove y(t)
+        P_operator = P_operator.replace(
+            lambda e: e == y,
+            lambda e: 1
+        )
+
+        # rimuove eventuali Derivative(y, ...) residui (difensivo)
+        P_operator = P_operator.replace(
+            lambda e: isinstance(e, sp.Derivative) and e.expr == y,
+            lambda e: d_sym ** e.derivative_count
+        )
+
+        P_operator = sp.expand(P_operator)
 
         # Esplicita l'azione di d come operatore differenziale: d^n * y -> Derivative(y, (t, n))
         def convert_d_operator(expr):
@@ -243,6 +353,22 @@ def solve_differential_equation(equation_str):
         print("[DEBUG] LHS dopo conversione d:", lhs_expr)
         print("[DEBUG] RHS dopo conversione d:", rhs_expr)
 
+        # --------------------------------------------------
+        # CONDIZIONI INIZIALI STANDARD
+        # --------------------------------------------------
+        ordine = 0
+        for deriv in lhs_expr.atoms(sp.Derivative):
+            if deriv.expr == y:
+                ordine = max(ordine, deriv.derivative_count)
+
+        # Se sono fornite condizioni iniziali, devono essere pari all’ordine
+        if condizioni_iniziali:
+            if len(condizioni_iniziali) != ordine:
+                return {
+                    "success": False,
+                    "error": f"Servono {ordine} condizioni iniziali, ne sono state fornite {len(condizioni_iniziali)}."
+                }
+
         # Espansione e semplificazione
         lhs_expr = expand(lhs_expr)
         rhs_expr = expand(rhs_expr)
@@ -270,12 +396,11 @@ def solve_differential_equation(equation_str):
         try:
             print("[DEBUG] Calcolo annichilatore...")
             u_func = rhs_expr
-            A_expr, A_latex = get_annichilatore(u_func)
-            # Mostra la forma fattorizzata di A(Δ) come calcolata da get_annichilatore
-            A_latex_factored = latex(A_expr).replace("Δ", r"\\\Delta")
+            A_expr, latex_in_Delta = get_annichilatore(u_func)
+            # latex_in_Delta is already d→\Delta replaced
             latex_steps.insert(1, {
                 "title": "Annichilatore \\( A(\\Delta) \\) tale che \\( A(\\Delta) u(t) = 0 \\):",
-                "content": rf"A(\Delta) = {A_latex_factored}"
+                "content": rf"A(\Delta) = {latex_in_Delta}"
             })
         except Exception as e:
             print("[DEBUG] Errore annichilatore:", str(e))
@@ -283,12 +408,7 @@ def solve_differential_equation(equation_str):
                 "title": r"Annichilatore $A(\Delta)$:",
                 "content": "Errore durante la determinazione"
             })
-
-        # Normalizza A_expr se contiene Δ Unicode per uso SymPy
-        delta_unicode = sp.Symbol("Δ")
         d_sym = sp.Symbol("d")
-        if A_expr.has(delta_unicode):
-            A_expr = A_expr.subs(delta_unicode, d_sym)
         print("[DEBUG] A_expr (versione SymPy):", A_expr)
 
         # ------------------------------------------------------------------
@@ -300,23 +420,33 @@ def solve_differential_equation(equation_str):
         #     "Δ - 2  *  y(t)" -> "Δ - 2"
         # ------------------------------------------------------------------
         lhs_clean = lhs_str.strip()
-        # elimina qualsiasi "* y" o "*y" o "* y(t)" finale
+        # remove any "* y" or "*y" or "* y(t)" at the end
         lhs_clean = re.sub(r'\*\s*y\s*(?:\(\s*t\s*\))?\s*$', '', lhs_clean)
-        # elimina anche eventuali moltiplicazioni implicite "y" alla fine
+        # also remove implicit multiplication "y" at the end
         lhs_clean = re.sub(r'\s*y\s*(?:\(\s*t\s*\))?\s*$', '', lhs_clean)
 
-        P_poly_str = lhs_clean if lhs_clean else "0"   # fallback di sicurezza
+        P_poly_str = lhs_clean if lhs_clean else "0"   # fallback
         P_poly_sym = parse_expr(
             P_poly_str,
             transformations=transformations,
-            local_dict={'Δ': d_sym, 'd': d_sym}
+            local_dict={'d': d_sym}
         )
 
-        full_operator = sp.expand(A_expr * P_poly_sym)   # polinomio in d
+        # --------------------------------------------------
+        # COSTRUISCI SOLO IL POLINOMIO OPERATORE (NO y, NO Derivative)
+        # --------------------------------------------------
+        full_operator = sp.expand(A_expr * P_operator)
+        # sicurezza: rimuove eventuali Derivative(y, t, ...) rimasti per errore
+        full_operator = full_operator.replace(
+            lambda e: isinstance(e, sp.Derivative),
+            lambda e: sp.Symbol("d") ** e.derivative_count
+        )
+        # Safety assertion: ensure no Δ remains internally
+        assert not full_operator.has(sp.Symbol("Δ"))
         y_func = Function('y')(t)
         def apply_polynomial_operator_to_y(poly, y, d, t):
-            # poly: polinomio in d
-            # restituisce la somma dei termini come derivate di y(t)
+            # poly: polynomial in d only
+            # returns the sum of terms as derivatives of y(t)
             poly = sp.expand(poly)
             result = 0
             for term in poly.as_ordered_terms():
@@ -324,14 +454,13 @@ def solve_differential_equation(equation_str):
                 if monom == 1:
                     result += coeff * y
                 else:
-                    # trova la potenza di d
+                    # find power of d
                     if monom.has(d):
                         if isinstance(monom, sp.Pow) and monom.base == d:
                             power = monom.exp
                         elif monom == d:
                             power = 1
                         else:
-                            # monom può essere prodotto di d**n * altro
                             if monom.is_Mul:
                                 power = 0
                                 for f in monom.args:
@@ -351,22 +480,19 @@ def solve_differential_equation(equation_str):
 
         applied_expr = apply_polynomial_operator_to_y(full_operator, y_func, d_sym, t)
 
-        print("[DEBUG] Operatore A(d)*P(d):", full_operator)
+        print("[DEBUG] Operatore A(d)*P(d) [solo operatore]:", full_operator)
         extended_lhs = applied_expr
         extended_eq  = Eq(extended_lhs, 0)
 
-        # Crea una forma compatta visibile in LaTeX usando \Delta
-        Δ = sp.Symbol("Δ")
-        d = sp.Symbol("d")
-        y_func = Function('y')(t)
-
-        # Ripristina l'espressione simbolica in Δ per visualizzazione
-        A_visual = A_expr.subs(d, Δ) if 'A_expr' in locals() else Δ
-        # Visualizza semplicemente P(Δ)∙y(t) senza espansioni ridondanti
-        P_visual = P_poly_sym.subs(d_sym, Δ) * y_func
-
-        full_visual_expr = sp.Eq(A_visual * P_visual, 0)
-        visual_latex = sp.latex(full_visual_expr).replace("Δ", r"\\\Delta")
+        # --------------------------------------------------
+        # COSTRUZIONE VISIVA CORRETTA: (A(Δ)P(Δ)) y(t) = 0
+        # --------------------------------------------------
+        # Build (A(d)P(d)) as a pure polynomial in d, then substitute d→Δ for LaTeX
+        full_poly = sp.expand(A_expr * P_operator)
+        # Ensure no Derivative objects are present in polynomial
+        assert not full_poly.has(sp.Derivative)
+        full_poly_latex = sp.latex(full_poly).replace("d", r"\Delta")
+        visual_latex = rf"\left({full_poly_latex}\right) y(t) = 0"
 
         try:
             ext_sol = dsolve(extended_eq, y)
@@ -473,6 +599,86 @@ def solve_differential_equation(equation_str):
             "content": y_general_latex
         })
 
+        # --------------------------------------------------
+        # APPLICAZIONE CONDIZIONI INIZIALI (se presenti)
+        # --------------------------------------------------
+        if condizioni_iniziali:
+            # --------------------------------------------------
+            # Controllo di compatibilità numero condizioni iniziali
+            # --------------------------------------------------
+            if len(condizioni_iniziali) > ordine:
+                return {
+                    "success": False,
+                    "error": (
+                        f"Numero di condizioni iniziali incompatibile: "
+                        f"ne sono state fornite {len(condizioni_iniziali)}, "
+                        f"ma l'equazione è di ordine {ordine}."
+                    )
+                }
+            # Ricava le costanti libere c_i
+            constants = sorted(
+                [s for s in y_general.free_symbols if s.name.startswith("c_")],
+                key=lambda s: s.name
+            )
+
+            eqs = []
+            for i in range(ordine):
+                deriv_val = y_general.diff(t, i).subs(t, 0)
+                rhs_val = sp.sympify(condizioni_iniziali[i])
+                eqs.append(sp.Eq(deriv_val, rhs_val))
+
+            sol_consts = sp.solve(eqs, constants, dict=True)
+
+            if sol_consts:
+                y_finale = y_general.subs(sol_consts[0])
+                latex_steps.append({
+                    "title": "Sistema delle condizioni iniziali:",
+                    "content": r"\begin{cases}" + r"\\ ".join(latex(eq) for eq in eqs) + r"\end{cases}"
+                })
+                latex_steps.append({
+                    "title": "Soluzione con condizioni iniziali:",
+                    "content": f"y(t) = {latex(y_finale)}"
+                })
+
+                # --------------------------------------------------
+                # Applica le soluzioni simboliche alla forma generale
+                # --------------------------------------------------
+                # --------------------------------------------------
+                # SCOMPOSIZIONE FINALE CORRETTA (BASATA SUI DATI REALI)
+                # risposta libera  = termini che dipendono dalle condizioni iniziali fornite
+                # risposta forzata = tutti gli altri termini
+                # --------------------------------------------------
+                y_finale = sp.expand(y_finale)
+
+                # simboli REALI delle condizioni iniziali (es. y_0, y_1, y_2)
+                cond_symbols = [
+                    sp.sympify(c) for c in condizioni_iniziali
+                    if isinstance(c, str)
+                ]
+
+                terms = y_finale.as_ordered_terms()
+
+                parte_libera = sum(
+                    term for term in terms
+                    if any(sym in term.free_symbols for sym in cond_symbols)
+                )
+
+                parte_forzata = sp.simplify(y_finale - parte_libera)
+
+                latex_steps.append({
+                    "title": "Scomposizione finale della soluzione:",
+                    "content": rf"""
+y(t) =
+\underbrace{{{sp.latex(parte_libera)}}}_\text{{risposta libera}}
+    +
+\underbrace{{{sp.latex(parte_forzata)}}}_\text{{risposta forzata}}
+"""
+                })
+
+                return {
+                    "success": True,
+                    "latex": latex_steps
+                }
 
         return {
             "success": True,

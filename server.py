@@ -22,6 +22,10 @@ def decomposizione():
 def equazioni_differenziali():
     return render_template("controlli/equazioni-differenziali.html")
 
+@app.route("/equazioni-differenze.html")
+def equazioni_differenze():
+    return render_template("controlli/equazioni-differenze.html")
+
 
 @app.route("/potenze-modulari.html")
 def potenze_modulari():

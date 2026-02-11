@@ -2,7 +2,7 @@
 
 {% block topbar_title %}
 <h2 class="navbar-brand mb-0 fw-bold">
-    Equazioni Differenziali
+    Equazioni alle Differenze
 </h2>
 {% endblock %}
 
@@ -18,6 +18,7 @@
     min-height: initial !important;
     height: auto !important;
   }
+  .result-section { padding-bottom: 3rem; }
 </style>
 
 <div class="row">
@@ -32,65 +33,51 @@
                   class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2"
                   type="button"
                   data-bs-toggle="collapse"
-                  data-bs-target="#descrizioneEqDiff"
+                  data-bs-target="#descrizioneEqDiffz"
                   aria-expanded="false"
-                  aria-controls="descrizioneEqDiff">
+                  aria-controls="descrizioneEqDiffz">
             <i id="descrizioneIcon" class="fas fa-chevron-down rotate-icon"></i>
             <span id="descrizioneText">Mostra descrizione</span>
           </button>
         </div>
 
-        <div id="descrizioneEqDiff" class="collapse mb-3">
+        <div id="descrizioneEqDiffz" class="collapse mb-3">
           <div class="card card-body bg-light border mt-2">
             <p class="text-muted mb-2">
-              Consideriamo un’equazione differenziale lineare a coefficienti costanti:
+              Consideriamo un’equazione alle differenze lineare a coefficienti costanti:
               \[
                 P(\Delta)\,y(t)=u(t),
               \]
-              dove \(P(\Delta)\) è un polinomio nell’operatore differenziale
-              \(\Delta=\frac{d}{dt}\).
+              dove \(\Delta\) è l’operatore <strong>alle differenze</strong>,
+              cioè \(\Delta y(t)=y(t+1)\).
             </p>
 
             <p class="text-muted mb-2">
-              Il metodo degli <strong>annichilatori</strong> consiste nel determinare un
-              operatore \(A(\Delta)\) tale che
+              Il metodo degli <strong>annichilatori</strong> resta identico al caso differenziale:
+              si costruisce \(A(\Delta)\) tale che:
               \[
                 A(\Delta)\,u(t)=0.
               \]
-              Applicando \(A(\Delta)\) a entrambi i membri dell’equazione si ottiene
-              un’equazione omogenea di ordine superiore, risolvibile tramite
-              l’equazione caratteristica. La soluzione generale è data dalla somma della soluzione dell’equazione
-              omogenea associata a \(P(\Delta)\) e di una soluzione particolare
-              compatibile con il termine noto \(u(t)\).
+              Applicando \(A(\Delta)\) a entrambi i membri si ottiene un’equazione omogenea di ordine superiore,
+              da cui si ricava la soluzione generale.
             </p>
 
             <p class="text-muted mb-2">
-              Una volta determinata la soluzione generale dell’equazione differenziale,
-              si procede all’imposizione delle <strong>condizioni iniziali</strong>.
-              Se \(\deg(P(\Delta))=n\), l’equazione è di ordine \(n\) e sono necessarie \(n\)
-              condizioni iniziali indipendenti per determinare univocamente le costanti arbitrarie.
-              Tipicamente si assumono condizioni nella forma:
+              Per determinare univocamente la soluzione, se \(\deg(P(\Delta))=n\) servono \(n\)
+              condizioni iniziali discrete nella forma:
             </p>
 
-            <p class="text-muted mb-2">
+            <p class="text-muted mb-0">
               \[
-                y(0)=y_0,\quad y'(0)=y_1,\quad \dots,\quad y^{(n-1)}(0)=y_{n-1}.
+                y(k)=y_k, \qquad k=0,1,\dots,n-1.
               \]
             </p>
-
-            <p class="text-muted mb-2">
-              L’imposizione delle condizioni iniziali consente di determinare in modo
-              univoco le costanti arbitrarie presenti nella soluzione generale e di
-              ottenere la soluzione fisicamente significativa del problema.
-            </p>
-
-  
           </div>
         </div>
 
         <div class="mb-2">
           <p class="form-label fw-semibold">
-            Inserisci un’equazione differenziale della forma \(P(\Delta)\,y(t)=u(t)\)
+            Inserisci un’equazione alle differenze della forma \(P(\Delta)\,y(t)=u(t)\)
           </p>
           <div class="mb-2">
             <math-field id="equationField"
@@ -128,18 +115,17 @@
         </div>
 
         <div class="form-text mb-2" style="font-size: 0.85rem;">
-          Per inserire l’operatore differenziale \(\Delta\) puoi digitare <code>D</code>
-          (oppure <code>\Delta</code>). La funzione esponenziale può essere inserita tramite <code>exp(...)</code>.
-          L’algoritmo calcola la soluzione generale dell’equazione differenziale e, se presenti,
-          impone le condizioni iniziali.
+          Per inserire l’operatore \(\Delta\) puoi digitare <code>D</code> (oppure <code>\Delta</code>).
+          Il simbolo <code>d</code> viene invece usato per l’impulso unitario discreto \(\delta_0(t)\).
+          L'algoritmo calcola la soluzione generale e impone le condizioni iniziali se presenti.
         </div>
 
         <div class="text-center mt-1">
-          <button id="calcButton" class="btn btn-primary btn-sm px-3" onclick="calcolaEquazioneDifferenziale()">
+          <button id="calcButton" class="btn btn-primary btn-sm px-3" onclick="calcolaEquazioneDifferenze()">
             <span id="calcButtonIcon"><i class="fas fa-play me-2"></i></span>
             Calcola
           </button>
-          <button class="btn btn-secondary btn-sm px-3 ms-1" onclick="resetEqDiff()">
+          <button class="btn btn-secondary btn-sm px-3 ms-1" onclick="resetEqDiffz()">
             <i class="fas fa-eraser me-2"></i>Pulisci
           </button>
         </div>
@@ -157,7 +143,7 @@
       </div>
       <div class="card-body" id="output">
         <div class="empty-state text-center text-muted py-5">
-          <i class="fas fa-wave-square fa-3x mb-3 opacity-50"></i>
+          <i class="fas fa-step-forward fa-3x mb-3 opacity-50"></i>
           <h6>Pronto</h6>
           <p class="small">Inserisci un'equazione e premi "Calcola".</p>
         </div>
@@ -181,13 +167,14 @@ function buildCondizioni(n) {
 
   container.style.display = 'block';
 
-  // Single inline row: y(0)=□  y'(0)=□  y''(0)=□ ...
+  // Build a single inline row: y(0)=□  y(1)=□  ...
+  // Use \quad for spacing so they appear side-by-side.
   let parts = [];
   for (let i = 0; i < n; i++) {
-    const deriv = i === 0 ? 'y' : `y^{(${i})}`;
-    parts.push(`${deriv}(0)=\\placeholder[c${i}]{y_${i}}`);
+    parts.push(`y(${i})=\\placeholder[c${i}]{y_${i}}`);
   }
-  mf.setValue(parts.join('\\quad '));
+  const value = parts.join('\\quad ');
+  mf.setValue(value);
 }
 
 document.getElementById('numCondizioni')
@@ -208,7 +195,7 @@ function scrollToOutput() {
   document.querySelector('.output-card').scrollIntoView({ behavior: 'smooth' });
 }
 
-function calcolaEquazioneDifferenziale() {
+function calcolaEquazioneDifferenze() {
   const buttonIcon = document.getElementById('calcButtonIcon');
   const output = document.getElementById('output');
   const pDeltaRaw = window.equationField.getPromptValue('pdelta')?.trim();
@@ -246,7 +233,7 @@ function calcolaEquazioneDifferenziale() {
     condizioni.push(v);
   }
 
-  fetch('/api/equazioni_differenziali', {
+  fetch('/api/equazioni_differenze', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -263,7 +250,7 @@ function calcolaEquazioneDifferenziale() {
     }
 
     let step0 = `
-      <p class="step-title"><b>0)</b> Equazione differenziale assegnata:</p>
+      <p class="step-title"><b>0)</b> Equazione alle differenze assegnata:</p>
       <p class="centered-math">\\[${pDelta}\\,y(t)=${rhs}\\]</p>
     `;
 
@@ -279,8 +266,8 @@ function calcolaEquazioneDifferenziale() {
     output.dataset.latex = stepHtml;
 
     const payload = {
-      title: 'Equazione Differenziale',
-      algorithm: 'Equazione Differenziale',
+      title: 'Equazione alle Differenze',
+      algorithm: 'Equazione alle Differenze',
       input: `${pDelta}y(t)=${rhs}`,
       htmlOutput: output.innerHTML,
       outputLatex: stepHtml,
@@ -300,7 +287,7 @@ function calcolaEquazioneDifferenziale() {
   });
 }
 
-function resetEqDiff() {
+function resetEqDiffz() {
   if (window.equationField) {
     window.equationField.setValue('\\placeholder[pdelta]{}\\,y(t)=\\placeholder[rhs]{}');
   }
@@ -309,10 +296,9 @@ function resetEqDiff() {
   const mf = document.getElementById('condizioniField');
   if (mf) mf.setValue('');
   if (cc) cc.style.display = 'none';
-
   document.getElementById('output').innerHTML =
     '<div class="empty-state text-center text-muted py-5">' +
-      '<i class="fas fa-wave-square fa-3x mb-3 opacity-50"></i>' +
+      '<i class="fas fa-step-forward fa-3x mb-3 opacity-50"></i>' +
       '<h6>Pronto</h6>' +
       '<p class="small">Inserisci un\'equazione e premi "Calcola".</p>' +
     '</div>';
@@ -320,22 +306,21 @@ function resetEqDiff() {
 
 document.addEventListener('DOMContentLoaded', () => {
   window.equationField = document.getElementById('equationField');
-
-  // Usa inlineShortcuts di MathLive per trasformare D in \\Delta
   window.equationField.inlineShortcuts = {
     ...window.equationField.inlineShortcuts,
-    'D': '\\Delta'
+    'D': '\\Delta',
+    'd': '\\delta_{0}'
   };
-
   const condField = document.getElementById('condizioniField');
   if (condField) {
     condField.inlineShortcuts = {
       ...condField.inlineShortcuts,
-      'D': '\\Delta'
+      'D': '\\Delta',
+      'd': '\\delta_{0}'
     };
   }
 
-  const descrCollapse = document.getElementById('descrizioneEqDiff');
+  const descrCollapse = document.getElementById('descrizioneEqDiffz');
   const descrText = document.getElementById('descrizioneText');
   const descrIcon = document.getElementById('descrizioneIcon');
 

@@ -15,6 +15,7 @@ def normalize_latex_like(expr: str) -> str:
         r"\ln": "log",
         r"\log": "log",
         r"\pi": "pi",
+        r"\sqrt": "sqrt",
     }
     for k, v in replacements.items():
         expr = expr.replace(k, v)
@@ -24,6 +25,12 @@ def normalize_latex_like(expr: str) -> str:
 
     # Frazioni compatte: \frac12 -> 1/2
     expr = re.sub(r'\\frac\s*([0-9]+)\s*([0-9]+)', r'\1/\2', expr)
+
+    # ------------------------------------------------------------
+    #  Radici: \sqrt{a} -> sqrt(a),  \sqrt2 -> sqrt(2)
+    # ------------------------------------------------------------
+    expr = re.sub(r"\\\\sqrt\s*\{([^}]*)\}", r"sqrt(\1)", expr)
+    expr = re.sub(r"\\\\sqrt\s*([0-9]+)", r"sqrt(\1)", expr)
 
     # Costanti e simboli
     expr = expr.replace("π", "pi")
@@ -40,8 +47,8 @@ def normalize_latex_like(expr: str) -> str:
     # Moltiplicazioni implicite tra parentesi: )(  -> )*(
     expr = re.sub(r'\)\s*\(', r')*(', expr)
 
-    # Inserisce parentesi automatiche: cos t → cos(t), exp -t → exp(-t)
-    expr = re.sub(r'\b(sin|cos|tan|exp|log)\s+([a-zA-Z0-9\-\+]+)', r'\1(\2)', expr)
+    # Inserisce parentesi automatiche: cos t → cos(t), exp -t → exp(-t), sqrt t → sqrt(t)
+    expr = re.sub(r'\b(sin|cos|tan|exp|log|sqrt)\s+([a-zA-Z0-9\-\+]+)', r'\1(\2)', expr)
 
     # (d±k)(...)y -> (d±k)(...)*y
     expr = re.sub(r'\)\s*y\b', r')*y', expr)
@@ -286,6 +293,7 @@ def solve_differential_equation(equation_str, condizioni_iniziali=None):
             'd': sp.Symbol('d'),
             'Derivative': Derivative,
             'exp': exp, 'cos': cos, 'sin': sin,
+            'sqrt': sp.sqrt,
             'e': exp(1),
             'pi': sp.pi,
             'log': sp.log,
@@ -665,14 +673,14 @@ def solve_differential_equation(equation_str, condizioni_iniziali=None):
 
                 parte_forzata = sp.simplify(y_finale - parte_libera)
 
+                # Due step separati (stile corso): y_f e y_l
                 latex_steps.append({
-                    "title": "Scomposizione finale della soluzione:",
-                    "content": rf"""
-y(t) =
-\underbrace{{{sp.latex(parte_libera)}}}_\text{{risposta libera}}
-    +
-\underbrace{{{sp.latex(parte_forzata)}}}_\text{{risposta forzata}}
-"""
+                    "title": "Risposta forzata:",
+                    "content": rf"y_{{f}}(t) = {sp.latex(parte_forzata)}"
+                })
+                latex_steps.append({
+                    "title": "Risposta libera:",
+                    "content": rf"y_{{l}}(t) = {sp.latex(parte_libera)}"
                 })
 
                 return {

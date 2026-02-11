@@ -119,6 +119,11 @@ class NotebookManager {
                 ex.algorithm && ex.algorithm.includes('Equazione Differenziale')
             ).length + 1;
             exerciseTitle = `Equazione Differenziale ${count}`;
+        } else if (path.includes('equazioni-differenze')) {
+            const count = this.notebookData.filter(ex =>
+                ex.algorithm && ex.algorithm.includes('Equazione alle Differenze')
+            ).length + 1;
+            exerciseTitle = `Equazione alle Differenze ${count}`;
         }
         else if (path.includes('studio-funzione')) {
             const count = this.notebookData.filter(ex =>
@@ -225,6 +230,8 @@ class NotebookManager {
             exerciseType = "Sistema Lineare";
         } else if (path.includes('equazioni-differenziali')) {
             exerciseType = "Equazione Differenziale";
+        } else if (path.includes('equazioni-differenze')) {
+            exerciseType = "Equazione alle Differenze";
         }
         else if (path.includes('studio-funzione')) {
             exerciseType = "Studio di Funzione";

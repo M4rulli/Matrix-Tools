@@ -3,7 +3,7 @@ const CONFIG = {
     API_BASE: "http://localhost:8000",
   },
   production: {
-    API_BASE: "https://matrix-tools-api.onrender.com",
+    API_BASE: "https://matrix-tools.onrender.com",
   },
 };
 

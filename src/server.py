@@ -9,13 +9,26 @@ from routes import register_routes
 app = Flask(__name__)
 CORS(
     app,
-    resources={r"/api/*": {"origins": [
-        "https://m4rulli.github.io",
-        "http://localhost:5173",
-        "http://localhost:3000",
-        "http://127.0.0.1:5173",
-        "http://127.0.0.1:3000",
-    ]}},
+    resources={
+        r"/api/*": {
+            "origins": [
+                "https://m4rulli.github.io",
+                "http://localhost:5173",
+                "http://localhost:3000",
+                "http://127.0.0.1:5173",
+                "http://127.0.0.1:3000",
+            ]
+        },
+        r"/health": {
+            "origins": [
+                "https://m4rulli.github.io",
+                "http://localhost:5173",
+                "http://localhost:3000",
+                "http://127.0.0.1:5173",
+                "http://127.0.0.1:3000",
+            ]
+        },
+    },
 )
 register_routes(app)
 

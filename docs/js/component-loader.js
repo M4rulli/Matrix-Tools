@@ -357,7 +357,6 @@
     }
 
     await Promise.all([
-      ensureScript(pathWithBase("/js/config.js")),
       ensureScript(MATHJAX_URL, "MathJax-script"),
       window.MathfieldElement ? Promise.resolve() : ensureScript(MATHLIVE_URL),
       ensureScript(pathWithBase("/js/anti-autoscroll.js")),

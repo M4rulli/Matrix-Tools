@@ -31,7 +31,7 @@ Matrix Tools helps users:
 ```text
 Matrix-Tools/
 ├── src/
-│   ├── server.py                 # Flask entrypoint (API + static serving)
+│   ├── server.py                 # Flask entrypoint (API only)
 │   ├── requirements.txt
 │   └── routes/                   # API blueprints per domain/module
 ├── docs/                         # Static frontend (GitHub Pages-ready)
@@ -48,7 +48,7 @@ Matrix-Tools/
 ## Technology Stack
 
 - Backend: Flask, Werkzeug, SymPy
-- Frontend: Vanilla JavaScript, HTML, CSS, Bootstrap, Font Awesome
+- Frontend: JavaScript, HTML, CSS, Bootstrap, Font Awesome
 - Math UX: MathLive, MathJax
 - Deployment model: static frontend + API backend
 

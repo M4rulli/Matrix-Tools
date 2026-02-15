@@ -1,9 +1,25 @@
 (function () {
   const MATHJAX_URL = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js";
   const MATHLIVE_URL = "https://unpkg.com/mathlive@0.92.0/dist/mathlive.min.js";
+  const BASE_PATH = (() => {
+    const seg = window.location.pathname.split("/").filter(Boolean);
+    if (window.location.hostname.endsWith("github.io") && seg.length > 0) {
+      return `/${seg[0]}`;
+    }
+    return "";
+  })();
+  const pathWithBase = (path) => `${BASE_PATH}${path}`;
+  const getLangAndSlug = () => {
+    const seg = window.location.pathname.split("/").filter(Boolean);
+    const offset = BASE_PATH ? 1 : 0;
+    return {
+      lang: seg[offset] || "",
+      slug: seg[offset + 1] || "",
+    };
+  };
 
   function detectLang() {
-    const first = window.location.pathname.split("/").filter(Boolean)[0];
+    const first = getLangAndSlug().lang;
     return first === "it" || first === "en" ? first : "en";
   }
 
@@ -21,16 +37,16 @@
     host.id = "sidebarHost";
     document.body.appendChild(host);
 
-    const response = await fetch("/components/sidebar.html", { cache: "no-cache" });
-    if (!response.ok) throw new Error("Failed loading /components/sidebar.html");
+    const response = await fetch(pathWithBase("/components/sidebar.html"), { cache: "no-cache" });
+    if (!response.ok) throw new Error(`Failed loading ${pathWithBase("/components/sidebar.html")}`);
     host.innerHTML = await response.text();
 
     const lang = detectLang();
-    const currentSlug = window.location.pathname.split("/").filter(Boolean)[1] || "";
+    const currentSlug = getLangAndSlug().slug;
 
     host.querySelectorAll("a[data-slug]").forEach((link) => {
       const slug = link.getAttribute("data-slug");
-      link.href = `/${lang}/${slug}`;
+      link.href = pathWithBase(`/${lang}/${slug}`);
       if (slug === currentSlug) link.classList.add("active");
       link.addEventListener("click", () => {
         closeSidebar();
@@ -38,7 +54,7 @@
     });
 
     const homeLink = host.querySelector("[data-home-link]");
-    if (homeLink) homeLink.href = `/${lang}/`;
+    if (homeLink) homeLink.href = pathWithBase(`/${lang}/`);
 
     host.querySelectorAll("[data-section-toggle]").forEach((btn) => {
       btn.addEventListener("click", () => {
@@ -213,8 +229,8 @@
 
   async function injectNotebookModal() {
     if (document.getElementById("notebookModal")) return;
-    const response = await fetch("/components/notebook-modal.html", { cache: "no-cache" });
-    if (!response.ok) throw new Error("Failed loading /components/notebook-modal.html");
+    const response = await fetch(pathWithBase("/components/notebook-modal.html"), { cache: "no-cache" });
+    if (!response.ok) throw new Error(`Failed loading ${pathWithBase("/components/notebook-modal.html")}`);
     const host = document.createElement("div");
     host.id = "notebookModalHost";
     host.innerHTML = await response.text();
@@ -222,8 +238,8 @@
   }
 
   async function injectFooter() {
-    const response = await fetch("/components/footer.html", { cache: "no-cache" });
-    if (!response.ok) throw new Error("Failed loading /components/footer.html");
+    const response = await fetch(pathWithBase("/components/footer.html"), { cache: "no-cache" });
+    if (!response.ok) throw new Error(`Failed loading ${pathWithBase("/components/footer.html")}`);
     const host = document.createElement("div");
     host.id = "footerHost";
     host.innerHTML = await response.text();
@@ -343,11 +359,11 @@
     await Promise.all([
       ensureScript(MATHJAX_URL, "MathJax-script"),
       window.MathfieldElement ? Promise.resolve() : ensureScript(MATHLIVE_URL),
-      ensureScript("/js/anti-autoscroll.js"),
-      ensureScript("/js/math-render-cache.js"),
-      ensureScript("/js/server-status.js"),
-      ensureScript("/js/notebook-export.js"),
-      ensureScript("/js/notebook.js"),
+      ensureScript(pathWithBase("/js/anti-autoscroll.js")),
+      ensureScript(pathWithBase("/js/math-render-cache.js")),
+      ensureScript(pathWithBase("/js/server-status.js")),
+      ensureScript(pathWithBase("/js/notebook-export.js")),
+      ensureScript(pathWithBase("/js/notebook.js")),
     ]);
 
     await Promise.all([
@@ -384,7 +400,7 @@
   document.addEventListener("DOMContentLoaded", async () => {
     try {
       await Promise.all([
-        loadComponent("navbar", "/components/navbar.html"),
+        loadComponent("navbar", pathWithBase("/components/navbar.html")),
         injectSidebar(),
         injectNotebookModal(),
         injectFooter(),

@@ -1,5 +1,17 @@
 (() => {
   const SUPPORTED_LANGS = new Set(["it", "en"]);
+  const BASE_PATH = (() => {
+    const seg = window.location.pathname.split("/").filter(Boolean);
+    if (window.location.hostname.endsWith("github.io") && seg.length > 0) {
+      return `/${seg[0]}`;
+    }
+    return "";
+  })();
+  const splitPath = () => {
+    const seg = window.location.pathname.split("/").filter(Boolean);
+    const offset = BASE_PATH ? 1 : 0;
+    return { seg, offset };
+  };
   const FLAG_BY_LANG = {
     it: {
       src: "https://flagcdn.com/w40/it.png",
@@ -88,7 +100,8 @@
   ];
 
   function currentLangFromPath() {
-    const first = window.location.pathname.split("/").filter(Boolean)[0];
+    const { seg, offset } = splitPath();
+    const first = seg[offset];
     return SUPPORTED_LANGS.has(first) ? first : "it";
   }
 
@@ -97,23 +110,15 @@
   }
 
   function languagePath(lang) {
-    const frontendPageMatch = window.location.pathname.match(/^\/frontend\/pages\/([^/]+)$/);
-    if (frontendPageMatch) {
-      return `/${lang}/${frontendPageMatch[1]}${window.location.search}${window.location.hash}`;
-    }
-
-    if (window.location.pathname === "/index.html") {
-      return `/${lang}/${window.location.search}${window.location.hash}`;
-    }
-
-    const parts = window.location.pathname.split("/").filter(Boolean);
+    const { seg, offset } = splitPath();
+    const parts = seg.slice(offset);
     if (parts.length > 0 && SUPPORTED_LANGS.has(parts[0])) {
       parts[0] = lang;
     } else {
       parts.unshift(lang);
     }
     const trailingSlash = window.location.pathname.endsWith("/");
-    const path = `/${parts.join("/")}${trailingSlash ? "/" : ""}`;
+    const path = `${BASE_PATH}/${parts.join("/")}${trailingSlash ? "/" : ""}`;
     return `${path}${window.location.search}${window.location.hash}`;
   }
 

@@ -730,7 +730,8 @@ window.injectSaveButton = function (outputDiv, payload) {
         cardBody.style.position = 'relative';
     }
 
-    // 3) Evita duplicati: keep only one save button per output card body
+    // 3) Evita duplicati: keep one floating host per output card body
+    cardBody.querySelectorAll('.save-to-notebook-float').forEach((host) => host.remove());
     cardBody.querySelectorAll('.save-to-notebook-btn').forEach((btn) => btn.remove());
     outputDiv.querySelectorAll('.save-to-notebook-btn').forEach((btn) => btn.remove());
 
@@ -748,8 +749,11 @@ window.injectSaveButton = function (outputDiv, payload) {
         }
     };
 
-    // 5) Insert into the card body and display it
-    cardBody.appendChild(btn);
+    // 5) Insert into a dedicated floating layer in the card body
+    const floatHost = document.createElement('div');
+    floatHost.className = 'save-to-notebook-float';
+    floatHost.appendChild(btn);
+    cardBody.appendChild(floatHost);
     btn.style.display = 'flex';
 };
 

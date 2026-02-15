@@ -17,6 +17,13 @@
 
   const EN_MAP = {
     "Aiuto": "Help",
+    "Moduli disponibili": "Available modules",
+    "Il tuo laboratorio matematico interattivo": "Your interactive mathematical laboratory",
+    "Esegui algoritmi passo dopo passo, salva i tuoi esercizi, genera soluzioni matematiche in LaTeX, PDF e altro ancora.": "Run algorithms step by step, save your exercises, and generate mathematical solutions in LaTeX, PDF, and more.",
+    "Inizia a calcolare": "Start computing",
+    "Scopri cosa puoi fare": "Explore what you can do",
+    "Esplora gli algoritmi disponibili": "Explore available algorithms",
+    "Ultime novità": "Latest updates",
     "Navigazione": "Navigation",
     "Input e Scorciatoie": "Input and Shortcuts",
     "Quaderno": "Notebook",
@@ -75,6 +82,9 @@
     ["Pronto", "Ready"],
     ["Aggiungi al quaderno", "Add to notebook"],
     ["Salva nel quaderno", "Save to notebook"],
+    ["Inizia a calcolare", "Start computing"],
+    ["Scopri cosa puoi fare", "Explore what you can do"],
+    ["Esplora gli algoritmi disponibili", "Explore available algorithms"],
   ];
 
   function currentLangFromPath() {
@@ -196,12 +206,41 @@
     window.location.href = languagePath(next);
   };
 
-  document.addEventListener("DOMContentLoaded", () => {
-    const lang = currentLangFromPath();
+  function applyLanguage(lang) {
     document.documentElement.setAttribute("lang", lang);
     updateToggleLabel(lang);
-    if (lang === "en") {
-      applyEnglishTranslation();
-    }
+    if (lang !== "en") return;
+    applyEnglishTranslation();
+  }
+
+  function scheduleEnglishReapply() {
+    if (currentLangFromPath() !== "en") return;
+    requestAnimationFrame(() => applyLanguage("en"));
+    setTimeout(() => applyLanguage("en"), 80);
+    setTimeout(() => applyLanguage("en"), 250);
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const lang = currentLangFromPath();
+    applyLanguage(lang);
   });
+
+  // Components are injected after DOMContentLoaded in static mode.
+  document.addEventListener("components:loaded", () => {
+    scheduleEnglishReapply();
+  });
+
+  // Translate dynamically injected/updated content (e.g. search results, async blocks).
+  const observer = new MutationObserver(() => {
+    if (currentLangFromPath() !== "en") return;
+    scheduleEnglishReapply();
+  });
+
+  if (document.documentElement) {
+    observer.observe(document.documentElement, {
+      childList: true,
+      subtree: true,
+      attributes: false,
+    });
+  }
 })();

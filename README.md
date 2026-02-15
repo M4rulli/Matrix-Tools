@@ -4,12 +4,10 @@ Refactor repository layout:
 
 ```text
 Matrix-Tools/
-├── src/                    # Backend/API source (Flask routes, templates, scripts)
+├── src/                    # Backend/API source (Flask routes)
 │   ├── server.py
 │   ├── requirements.txt
-│   ├── routes/
-│   ├── scripts/
-│   └── templates/
+│   └── routes/
 ├── docs/                   # Static frontend (GitHub Pages ready)
 │   ├── index.html
 │   ├── css/
@@ -32,10 +30,4 @@ Default local URL: `http://127.0.0.1:10000`
 
 ```bash
 pip install -r src/requirements.txt
-```
-
-## Regenerate static pages
-
-```bash
-python3 src/scripts/export_static_pages.py
 ```

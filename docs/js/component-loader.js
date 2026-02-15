@@ -62,13 +62,85 @@
     const clear = host.querySelector("#searchClear-static");
     const results = host.querySelector("#searchResults-static");
     if (!input || !clear || !results) return;
+    const lang = detectLang();
+    const descriptionsBySlug = {
+      "linearization.html": {
+        it: "Linearizza sistemi non lineari attorno ai punti di equilibrio.",
+        en: "Linearize nonlinear systems around equilibrium points.",
+      },
+      "spectral-decomposition.html": {
+        it: "Calcola la decomposizione spettrale di matrici e sistemi.",
+        en: "Compute spectral decomposition for matrices and systems.",
+      },
+      "differential-equations.html": {
+        it: "Risolvi e analizza equazioni differenziali passo-passo.",
+        en: "Solve and analyze differential equations step by step.",
+      },
+      "difference-equations.html": {
+        it: "Studia ricorrenze e sistemi a tempo discreto.",
+        en: "Study recurrences and discrete-time systems.",
+      },
+      "dynamical-systems.html": {
+        it: "Analizza stato e uscita di sistemi dinamici.",
+        en: "Analyze state and output of dynamical systems.",
+      },
+      "modular-powers.html": {
+        it: "Calcola potenze modulari utili in teoria dei numeri e crittografia.",
+        en: "Compute modular powers for number theory and cryptography.",
+      },
+      "hasse-diagram.html": {
+        it: "Costruisci diagrammi di Hasse per ordini parziali.",
+        en: "Build Hasse diagrams for partial orders.",
+      },
+      "boolean-polynomials.html": {
+        it: "Semplifica e analizza espressioni e polinomi booleani.",
+        en: "Simplify and analyze Boolean expressions and polynomials.",
+      },
+      "chinese-remainder-theorem.html": {
+        it: "Risolvi sistemi di congruenze con il teorema cinese del resto.",
+        en: "Solve congruence systems using the Chinese remainder theorem.",
+      },
+      "bezout-identity.html": {
+        it: "Trova coefficienti di Bezout e MCD esteso.",
+        en: "Find Bezout coefficients and extended GCD.",
+      },
+      "laplace-determinant.html": {
+        it: "Calcola determinanti con sviluppo di Laplace.",
+        en: "Compute determinants with Laplace expansion.",
+      },
+      "eigenvalues-eigenvectors.html": {
+        it: "Trova autovalori, autovettori e molteplicità.",
+        en: "Find eigenvalues, eigenvectors, and multiplicities.",
+      },
+      "linear-systems.html": {
+        it: "Risolvi sistemi lineari e verifica compatibilità.",
+        en: "Solve linear systems and verify consistency.",
+      },
+      "simplex.html": {
+        it: "Risolvi problemi di programmazione lineare con il simplesso.",
+        en: "Solve linear programming problems with simplex.",
+      },
+      "complementary-conditions.html": {
+        it: "Verifica e applica condizioni di complementarità.",
+        en: "Check and apply complementary conditions.",
+      },
+      "function-study.html": {
+        it: "Esegui lo studio completo di una funzione reale.",
+        en: "Run a complete study of a real-valued function.",
+      },
+      "integrals.html": {
+        it: "Calcola integrali con passaggi simbolici dettagliati.",
+        en: "Compute integrals with detailed symbolic steps.",
+      },
+    };
 
     const dataset = Array.from(host.querySelectorAll(".algorithm-link[data-slug]")).map((link) => {
       const icon = link.querySelector("i")?.className || "fas fa-square";
       const title = link.querySelector("span")?.textContent?.trim() || link.textContent.trim();
       const slug = link.getAttribute("data-slug");
       const category = link.closest(".category-section")?.querySelector(".category-title span")?.textContent?.trim() || "";
-      return { icon, title, slug, category, href: link.href };
+      const description = descriptionsBySlug[slug]?.[lang] || descriptionsBySlug[slug]?.it || "";
+      return { icon, title, slug, category, description, href: link.href };
     });
 
     function closeResults() {
@@ -101,6 +173,7 @@
               <span class="search-result-title">${item.title}</span>
               <span class="search-result-category">${item.category}</span>
             </div>
+            <div class="search-result-description">${item.description}</div>
           </div>`;
         row.addEventListener("click", () => {
           window.location.href = item.href;
@@ -119,7 +192,8 @@
       clear.style.display = "flex";
       const filtered = dataset.filter((item) =>
         item.title.toLowerCase().includes(q) ||
-        item.category.toLowerCase().includes(q),
+        item.category.toLowerCase().includes(q) ||
+        item.description.toLowerCase().includes(q),
       );
       openResults(filtered, q);
     });

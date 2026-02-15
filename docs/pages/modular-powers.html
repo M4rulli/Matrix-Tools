@@ -16,9 +16,18 @@
   <link rel="stylesheet" href="https://unpkg.com/mathlive/dist/mathlive-static.css" />
   <link href="/css/style.css" rel="stylesheet" />
   <link href="/css/panels-theme.css" rel="stylesheet" />
-  
+  <style>
+    /* Keep this input card compact on modular powers page */
+    .page-modular-powers .calculator-card {
+      min-height: auto !important;
+      height: auto !important;
+    }
+    .page-modular-powers .card-body.modern-body > .mb-4:last-of-type {
+      margin-bottom: 0.75rem !important;
+    }
+  </style>
 </head>
-<body>
+<body class="page-modular-powers">
   <div id="navbar"></div>
 
   <div class="container-fluid" style="margin-top: 100px; padding: 0rem 1.5rem 0rem 0rem !important;">
@@ -31,7 +40,7 @@
                 </h5>
             </div>
             <div class="card-body modern-body">
-                <div class="mb-4">
+                <div class="mb-3">
                     <button
                         id="toggleDescrizione"
                         class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2"
@@ -84,8 +93,8 @@
                         </math-field>
                     </div>
                     <div
-                        class="form-text mb-3"
-                        style="font-size: 0.85rem; margin-top: 20px"
+                        class="form-text mb-2"
+                        style="font-size: 0.85rem; margin-top: 12px"
                     >
                         L’operazione \(a^b \bmod n\) si svolge nell’anello
                         unitario \(\mathbb{Z}_n\), l’insieme dei resti modulo

@@ -1,103 +1,351 @@
 <!DOCTYPE html>
-<html lang="it" data-page-title="Matrix Tools">
+<html lang="it" data-theme="light">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Matrix Tools</title>
-  <link rel="icon" href="/assets/icons/favicon.ico" sizes="any">
-  <link rel="icon" type="image/svg+xml" href="/assets/icons/favicon.svg">
-  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png">
-  <link rel="manifest" href="/assets/icons/site.webmanifest">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link href="/css/style.css" rel="stylesheet" />
-  <link href="/css/panels-theme.css" rel="stylesheet" />
-  <style>
-    .home-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 1rem;
-      margin-top: 1rem;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrix Tools - Il tuo laboratorio matematico interattivo</title>
 
-    .home-link {
-      border: 1px solid var(--field-border, #d0d7e2);
-      border-radius: 14px;
-      background: var(--panel-surface, rgba(255, 255, 255, 0.75));
-      box-shadow: var(--panel-shadow, 0 8px 24px rgba(15, 23, 42, 0.08));
-      text-decoration: none;
-      color: inherit;
-      padding: 1rem;
-      display: block;
-      transition: transform .2s ease, box-shadow .2s ease;
-    }
+    <meta name="description" content="Esegui algoritmi matematici passo dopo passo, salva i tuoi esercizi, genera soluzioni in LaTeX, PDF e altro ancora. Strumenti professionali per algebra, teoria dei controlli e matematica avanzata.">
+    <meta name="keywords" content="calcolatore matematico, algebra, teoria controlli, LaTeX, PDF, quaderno matematico">
+    <meta property="og:title" content="Matrix Tools - Il tuo laboratorio matematico interattivo">
+    <meta property="og:description" content="Esegui algoritmi, salva esercizi, genera soluzioni matematiche in LaTeX e PDF.">
+    <meta property="og:type" content="website">
 
-    .home-link:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--panel-shadow-hover, 0 14px 28px rgba(15, 23, 42, 0.12));
-    }
+    <link rel="icon" href="/assets/icons/favicon.ico" sizes="any">
+    <link rel="icon" type="image/svg+xml" href="/assets/icons/favicon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png">
+    <link rel="manifest" href="/assets/icons/site.webmanifest">
 
-    .home-link h6 {
-      margin: 0;
-      font-weight: 700;
-    }
-  </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        :root {
+            --text-primary: #1a202c;
+            --text-secondary: #718096;
+            --text-muted: #a0aec0;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f7fafc;
+            --bg-card: #ffffff;
+            --border-light: #e2e8f0;
+            --border-focus: #3182ce;
+            --accent: #3182ce;
+            --accent-light: #ebf8ff;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        [data-theme="dark"] {
+            --text-primary: #f7fafc;
+            --text-secondary: #cbd5e0;
+            --text-muted: #718096;
+            --bg-primary: #1a202c;
+            --bg-secondary: #2d3748;
+            --bg-card: #2d3748;
+            --border-light: #4a5568;
+            --border-focus: #63b3ed;
+            --accent: #63b3ed;
+            --accent-light: #2a4365;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: all 0.3s ease;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
+
+        .header {
+            background-color: var(--bg-card);
+            border-bottom: 1px solid var(--border-light);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-content { display: flex; justify-content: space-between; align-items: center; }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            font-size: 1.25rem;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .logo i { color: var(--accent); }
+
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border-light);
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+        }
+
+        .theme-toggle:hover { color: var(--accent); border-color: var(--accent); }
+
+        .hero { padding: 4rem 0; text-align: center; }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+        .btn {
+            padding: 0.875rem 2rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary { background-color: var(--accent); color: white; }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: var(--shadow-lg); color: white; }
+        .btn-outline { background-color: transparent; color: var(--accent); border: 1px solid var(--accent); }
+        .btn-outline:hover { background-color: var(--accent); color: white; }
+
+        .algorithms { padding: 4rem 0; background-color: var(--bg-secondary); }
+        .section-title { font-size: 2rem; font-weight: 600; text-align: center; margin-bottom: 3rem; }
+
+        .algorithms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .algorithm-card {
+            background-color: var(--bg-card);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: all 0.2s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .algorithm-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); color: inherit; }
+        .algorithm-icon { color: var(--accent); font-size: 2rem; margin-bottom: 1rem; }
+        .algorithm-title { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .algorithm-category { color: var(--text-muted); font-size: 0.875rem; margin-bottom: 0.75rem; }
+        .algorithm-description { color: var(--text-secondary); font-size: 0.9rem; }
+
+        .about { padding: 4rem 0; }
+        .about-content { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 3rem; align-items: center; }
+        .about-text h2 { font-size: 2rem; font-weight: 600; margin-bottom: 1rem; }
+        .about-text p { color: var(--text-secondary); margin-bottom: 1.5rem; }
+        .feature-list { list-style: none; margin-bottom: 1.5rem; }
+        .feature-list li { padding: 0.5rem 0; display: flex; align-items: center; gap: 0.75rem; }
+        .feature-list i { color: var(--accent); width: 20px; }
+
+        .updates { padding: 4rem 0; background-color: var(--bg-secondary); }
+        .updates-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; }
+        .update-card { background-color: var(--bg-card); border-radius: 0.75rem; padding: 1.5rem; box-shadow: var(--shadow); }
+        .update-date { color: var(--text-muted); font-size: 0.875rem; margin-bottom: 0.5rem; }
+        .update-title { font-weight: 600; margin-bottom: 0.5rem; }
+        .update-description { color: var(--text-secondary); font-size: 0.9rem; }
+
+        .footer { padding: 2rem 0; border-top: 1px solid var(--border-light); text-align: center; color: var(--text-muted); }
+
+        @media (max-width: 768px) {
+            .container { padding: 0 1rem; }
+            .hero { padding: 2rem 0; }
+            .hero h1 { font-size: 2rem; }
+            .hero p { font-size: 1.125rem; }
+            .cta-buttons { flex-direction: column; align-items: center; }
+            .btn { width: 100%; max-width: 300px; justify-content: center; }
+            .algorithms, .about, .updates { padding: 2rem 0; }
+            .section-title { font-size: 1.75rem; margin-bottom: 2rem; }
+            .algorithms-grid { grid-template-columns: 1fr; gap: 1rem; }
+            .algorithm-card { padding: 1.25rem; }
+            .about-content { grid-template-columns: 1fr; gap: 2rem; }
+        }
+    </style>
 </head>
 <body>
-  <div id="navbar"></div>
-
-  <main class="container-fluid" style="margin-top: 100px; padding: 0rem 1.5rem 0rem 0rem !important;">
-    <div class="row">
-      <div class="col-12">
-        <div class="card calculator-card shadow-sm">
-          <div class="card-header bg-primary text-white">
-            <h5 class="card-title mb-0"><i class="fas fa-layer-group me-2"></i>Moduli disponibili</h5>
-          </div>
-          <div class="card-body">
-            <div class="home-grid" id="homeGrid"></div>
-          </div>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="#" id="homeLink" class="logo">
+                    <i class="fas fa-calculator"></i>
+                    Matrix Tools
+                </a>
+                <button class="theme-toggle" onclick="toggleTheme()" aria-label="Cambia tema">
+                    <i class="fas fa-moon" id="theme-icon"></i>
+                </button>
+            </div>
         </div>
-      </div>
-    </div>
-  </main>
+    </header>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="/js/layout-state.js"></script>
-  <script src="/js/site-i18n.js"></script>
-  <script src="/js/component-loader.js"></script>
-  <script>
-    (function renderHomeLinks() {
-      const lang = (window.location.pathname.split('/').filter(Boolean)[0] || 'it');
-      const pages = [
-        ['Linearizzazione', 'linearization.html'],
-        ['Decomposizione Spettrale', 'spectral-decomposition.html'],
-        ['Equazioni Differenziali', 'differential-equations.html'],
-        ['Equazioni alle Differenze', 'difference-equations.html'],
-        ['Sistemi Dinamici', 'dynamical-systems.html'],
-        ['Potenze Modulari', 'modular-powers.html'],
-        ['Diagramma di Hasse', 'hasse-diagram.html'],
-        ['Polinomi Booleani', 'boolean-polynomials.html'],
-        ['Teorema Cinese del Resto', 'chinese-remainder-theorem.html'],
-        ['Identità di Bézout', 'bezout-identity.html'],
-        ['Determinante con Laplace', 'laplace-determinant.html'],
-        ['Autovalori e Autovettori', 'eigenvalues-eigenvectors.html'],
-        ['Sistemi Lineari', 'linear-systems.html'],
-        ['Metodo del Simplesso', 'simplex.html'],
-        ['Condizioni di Complementarità', 'complementary-conditions.html'],
-        ['Studio di Funzione', 'function-study.html'],
-        ['Integrali', 'integrals.html'],
-      ];
+    <section class="hero">
+        <div class="container">
+            <h1>Il tuo laboratorio matematico interattivo</h1>
+            <p>Esegui algoritmi <strong>passo dopo passo</strong>, salva i tuoi esercizi, genera soluzioni matematiche in LaTeX, PDF e altro ancora.</p>
+            <div class="cta-buttons">
+                <a href="#" data-slug="modular-powers.html" class="btn btn-primary">
+                    <i class="fas fa-play"></i>
+                    Inizia a calcolare
+                </a>
+                <a href="#algorithms" class="btn btn-outline">
+                    <i class="fas fa-compass"></i>
+                    Scopri cosa puoi fare
+                </a>
+            </div>
+        </div>
+    </section>
 
-      const target = document.getElementById('homeGrid');
-      if (!target) return;
+    <section class="algorithms" id="algorithms">
+        <div class="container">
+            <h2 class="section-title">Esplora gli algoritmi disponibili</h2>
+            <div class="algorithms-grid">
+                <a href="#" data-slug="function-study.html" class="algorithm-card"><div class="algorithm-icon"><i class="fas fa-wave-square"></i></div><h3 class="algorithm-title">Studio di Funzione</h3><div class="algorithm-category">Analisi Matematica</div><p class="algorithm-description">Studio completo di una funzione reale: dominio, limiti, derivabilità, monotonia ed estremi.</p></a>
+                <a href="#" data-slug="modular-powers.html" class="algorithm-card"><div class="algorithm-icon"><i class="fas fa-divide"></i></div><h3 class="algorithm-title">Potenze Modulari</h3><div class="algorithm-category">Algebra e Logica</div><p class="algorithm-description">Calcolo efficiente di a^b mod n utilizzato in crittografia e teoria dei numeri.</p></a>
+                <a href="#" data-slug="linearization.html" class="algorithm-card"><div class="algorithm-icon"><i class="fas fa-project-diagram"></i></div><h3 class="algorithm-title">Linearizzazione</h3><div class="algorithm-category">Teoria dei Controlli</div><p class="algorithm-description">Linearizzazione di sistemi dinamici non lineari intorno ai punti di equilibrio.</p></a>
+                <a href="#" data-slug="hasse-diagram.html" class="algorithm-card"><div class="algorithm-icon"><i class="fas fa-sitemap"></i></div><h3 class="algorithm-title">Diagramma di Hasse</h3><div class="algorithm-category">Algebra e Logica</div><p class="algorithm-description">Rappresentazione grafica di relazioni di ordine parziale e reticoli.</p></a>
+                <a href="#" data-slug="boolean-polynomials.html" class="algorithm-card"><div class="algorithm-icon"><i class="fas fa-code-branch"></i></div><h3 class="algorithm-title">Polinomi Booleani</h3><div class="algorithm-category">Algebra e Logica</div><p class="algorithm-description">Analisi e semplificazione di espressioni logiche booleane.</p></a>
+                <a href="#" data-slug="laplace-determinant.html" class="algorithm-card"><div class="algorithm-icon"><i class="fas fa-calculator"></i></div><h3 class="algorithm-title">Determinante di Laplace</h3><div class="algorithm-category">Algebra Lineare</div><p class="algorithm-description">Calcolo dettagliato del determinante di una matrice quadrata tramite sviluppo di Laplace.</p></a>
+                <a href="#" data-slug="eigenvalues-eigenvectors.html" class="algorithm-card"><div class="algorithm-icon"><i class="fas fa-chart-line"></i></div><h3 class="algorithm-title">Autovalori e Autovettori</h3><div class="algorithm-category">Algebra Lineare</div><p class="algorithm-description">Calcolo di autovalori, autovettori e molteplicità per matrici quadrate.</p></a>
+                <a href="#" data-slug="linear-systems.html" class="algorithm-card"><div class="algorithm-icon"><i class="fas fa-project-diagram"></i></div><h3 class="algorithm-title">Sistemi Lineari</h3><div class="algorithm-category">Algebra Lineare</div><p class="algorithm-description">Risoluzione di sistemi lineari: compatibilità, forma a gradini, parametrizzazione, teorema di Rouché-Capelli.</p></a>
+                <a href="#" data-slug="simplex.html" class="algorithm-card"><div class="algorithm-icon"><i class="fas fa-table"></i></div><h3 class="algorithm-title">Metodo del Simplesso</h3><div class="algorithm-category">Ricerca Operativa</div><p class="algorithm-description">Risoluzione di problemi di programmazione lineare tramite il metodo del simplesso, con supporto a vincoli e funzioni obiettivo.</p></a>
+                <a href="#" data-slug="complementary-conditions.html" class="algorithm-card"><div class="algorithm-icon"><i class="fas fa-balance-scale"></i></div><h3 class="algorithm-title">Condizioni di Complementarità</h3><div class="algorithm-category">Ricerca Operativa</div><p class="algorithm-description">Verifica di ammissibilità e costruzione del sistema lineare mediante condizioni di complementarità.</p></a>
+            </div>
+        </div>
+    </section>
 
-      target.innerHTML = pages.map(([label, slug]) => (
-        `<a class="home-link" href="/${lang}/${slug}"><h6>${label}</h6></a>`
-      )).join('');
-    })();
-  </script>
+    <section class="about" id="about">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-text">
+                    <h2>Che cos'è Matrix Tools</h2>
+                    <p>Una piattaforma professionale per calcoli matematici avanzati, progettata per studenti, ricercatori e professionisti che necessitano di strumenti affidabili per algebra, teoria dei controlli e matematica computazionale.</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check"></i>Algoritmi matematici specializzati</li>
+                        <li><i class="fas fa-check"></i>Sistema quaderno per salvare esercizi</li>
+                        <li><i class="fas fa-check"></i>Esportazione in LaTeX e PDF</li>
+                        <li><i class="fas fa-check"></i>Interfaccia moderna e responsive</li>
+                        <li><i class="fas fa-check"></i>Completamente gratuito e open source</li>
+                    </ul>
+                    <a href="https://github.com/M4rulli/Matrix-Tools" class="btn btn-outline">
+                        <i class="fab fa-github"></i>
+                        Visualizza su GitHub
+                    </a>
+                </div>
+                <div class="about-visual">
+                    <div style="background: var(--accent-light); border-radius: 1rem; padding: 2rem; text-align: center;">
+                        <i class="fas fa-calculator" style="font-size: 4rem; color: var(--accent); margin-bottom: 1rem;"></i>
+                        <h3>Strumenti Professionali</h3>
+                        <p style="color: var(--text-secondary); margin-top: 0.5rem;">Algoritmi accurati e interfaccia intuitiva per ogni esigenza matematica.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="updates" id="updates">
+        <div class="container">
+            <h2 class="section-title">Ultime novità</h2>
+            <div class="updates-grid">
+                <div class="update-card"><div class="update-date">Luglio 2025</div><h3 class="update-title">Sistema Quaderno Avanzato</h3><p class="update-description">Nuovo sistema per salvare, organizzare ed esportare i tuoi esercizi matematici in multiple formati.</p></div>
+                <div class="update-card"><div class="update-date">Luglio 2025</div><h3 class="update-title">Design Rinnovato</h3><p class="update-description">Interfaccia completamente ridisegnata con supporto tema scuro e design responsive.</p></div>
+                <div class="update-card"><div class="update-date">Prossimamente</div><h3 class="update-title">Nuovi Algoritmi</h3><p class="update-description">In arrivo algoritmi per equazioni differenziali, sistemi lineari e analisi numerica.</p></div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Matrix Tools. Progetto open source per l'educazione matematica.</p>
+        </div>
+    </footer>
+
+    <script>
+        function detectLang() {
+            const first = window.location.pathname.split('/').filter(Boolean)[0];
+            return first === 'it' || first === 'en' ? first : 'en';
+        }
+
+        function applyLocalizedLinks() {
+            const lang = detectLang();
+            const home = document.getElementById('homeLink');
+            if (home) home.href = '/' + lang + '/';
+
+            document.querySelectorAll('[data-slug]').forEach((el) => {
+                const slug = el.getAttribute('data-slug');
+                el.href = '/' + lang + '/' + slug;
+            });
+        }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const icon = document.getElementById('theme-icon');
+            const currentTheme = html.getAttribute('data-theme');
+
+            if (currentTheme === 'dark') {
+                html.setAttribute('data-theme', 'light');
+                icon.className = 'fas fa-moon';
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                icon.className = 'fas fa-sun';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            applyLocalizedLinks();
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            const html = document.documentElement;
+            const icon = document.getElementById('theme-icon');
+            html.setAttribute('data-theme', savedTheme);
+            icon.className = savedTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+        });
+
+        document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+            anchor.addEventListener('click', function (e) {
+                const href = this.getAttribute('href');
+                if (!href || !href.startsWith('#') || href === '#') return;
+                e.preventDefault();
+                const target = document.querySelector(href);
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
 </body>
 </html>

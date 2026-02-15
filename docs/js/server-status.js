@@ -1,10 +1,12 @@
 (() => {
   const RETRY_MS = 3000;
-  const COLD_START_GRACE_MS = 20000;
+  const COLD_START_GRACE_MS = 90000;
+  const PING_TIMEOUT_MS = 15000;
 
   let online = false;
   let startedAt = 0;
   let retryTimer = null;
+  let warmupFired = false;
 
   function resolveApiBase() {
     const explicit = window.API_BASE || window.MATRIX_API_BASE_URL || document.documentElement.getAttribute("data-api-base");
@@ -14,6 +16,10 @@
 
   function healthUrl() {
     return `${resolveApiBase()}/health`;
+  }
+
+  function rootUrl() {
+    return resolveApiBase();
   }
 
   function setBadge(status, label) {
@@ -59,15 +65,29 @@
     });
   }
 
+  function fireWarmupRequests() {
+    if (warmupFired) return;
+    warmupFired = true;
+
+    const opts = {
+      method: "GET",
+      mode: "no-cors",
+      cache: "no-store",
+      keepalive: true,
+    };
+
+    fetch(rootUrl(), opts).catch(() => {});
+    fetch(healthUrl(), opts).catch(() => {});
+  }
+
   async function pingOnce() {
     try {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 2500);
+      const timeout = setTimeout(() => controller.abort(), PING_TIMEOUT_MS);
       const response = await fetch(healthUrl(), {
         method: "GET",
         cache: "no-store",
         signal: controller.signal,
-        headers: { Accept: "application/json" },
       });
       clearTimeout(timeout);
       if (!response.ok) return false;
@@ -109,6 +129,7 @@
     startedAt = Date.now();
     setBadge("status-booting", "Avvio server...");
     setApiButtonsDisabled(true);
+    fireWarmupRequests();
     monitor();
   };
 })();

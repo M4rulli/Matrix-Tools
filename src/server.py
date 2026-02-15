@@ -7,27 +7,21 @@ from flask_cors import CORS
 from routes import register_routes
 
 app = Flask(__name__)
+
+FRONTEND_ORIGINS = [
+    r"https://.*\.github\.io",
+    "https://m4rulli.github.io",
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:3000",
+]
+
 CORS(
     app,
     resources={
-        r"/api/*": {
-            "origins": [
-                "https://m4rulli.github.io",
-                "http://localhost:5173",
-                "http://localhost:3000",
-                "http://127.0.0.1:5173",
-                "http://127.0.0.1:3000",
-            ]
-        },
-        r"/health": {
-            "origins": [
-                "https://m4rulli.github.io",
-                "http://localhost:5173",
-                "http://localhost:3000",
-                "http://127.0.0.1:5173",
-                "http://127.0.0.1:3000",
-            ]
-        },
+        r"/api/*": {"origins": FRONTEND_ORIGINS},
+        r"/health": {"origins": FRONTEND_ORIGINS},
     },
 )
 register_routes(app)

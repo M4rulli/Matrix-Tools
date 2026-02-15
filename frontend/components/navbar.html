@@ -1,0 +1,40 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+  <div class="container-fluid">
+    <button type="button" id="sidebarCollapse" class="btn btn-outline-primary me-3" onclick="toggleSidebar(); event.stopPropagation();">
+      <i class="fas fa-bars"></i>
+    </button>
+
+    <h2 id="topbarTitle" class="navbar-brand mb-0 fw-bold">Matrix Tools</h2>
+
+    <div class="topbar-controls ms-auto">
+      <button id="serverStatusBadge" class="btn btn-outline-secondary btn-sm server-status-badge status-booting" type="button" aria-label="Avvio server..." data-status-label="Avvio server...">
+        <span class="server-status-dot" aria-hidden="true"></span>
+      </button>
+
+      <div class="theme-switch-container">
+        <label class="theme-switch" for="themeToggle">
+          <input type="checkbox" id="themeToggle" onchange="toggleTheme()">
+          <span class="theme-slider">
+            <i class="fas fa-sun theme-icon sun-icon"></i>
+            <i class="fas fa-moon theme-icon moon-icon"></i>
+          </span>
+        </label>
+      </div>
+
+      <button class="btn btn-outline-info btn-sm language-toggle-btn" id="languageToggleBtn" type="button" onclick="toggleLanguage()" aria-label="Cambia lingua" title="Cambia lingua">
+        <img
+          id="languageToggleFlag"
+          class="flag-icon"
+          src="https://flagcdn.com/w40/it.png"
+          srcset="https://flagcdn.com/w80/it.png 2x"
+          alt="Italiano"
+          data-no-i18n="true"
+        >
+      </button>
+
+      <button class="btn btn-outline-info btn-sm help-icon-btn" onclick="showHelp()" aria-label="Aiuto" title="Aiuto">
+        <span class="help-btn-question" data-no-i18n="true">?</span>
+      </button>
+    </div>
+  </div>
+</nav>

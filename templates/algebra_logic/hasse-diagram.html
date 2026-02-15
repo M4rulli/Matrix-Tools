@@ -1,0 +1,384 @@
+{% extends "layout.html" %}
+
+{% block topbar_title %}
+<h2 class="navbar-brand mb-0 fw-bold">
+    Diagramma di Hasse
+</h2>
+{% endblock %}
+
+{% block algorithm_content %}
+<style>
+  .rotate-icon {
+    transition: transform 0.3s ease;
+  }
+  .step-title {
+    margin-top: 1em;
+  }
+  .centered-math {
+    text-align: center;
+  }
+  :root[data-theme='dark'] ::placeholder {
+    color: white !important;
+    opacity: 1; /* mostra il placeholder completamente */
+  }
+</style>
+
+<div class="row">
+    <!-- Card di Input -->
+    <div class="col-12 mb-4">
+      <div class="card calculator-card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="card-title mb-0">
+            <i class="fas fa-edit me-2"></i>Input
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="mb-3 mb-3">
+            <button id="toggleDescrizione" class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2" style="font-size: 0.875rem;" type="button" data-bs-toggle="collapse" data-bs-target="#descrizioneHasse" aria-expanded="false" aria-controls="descrizioneHasse">
+              <i class="fas fa-chevron-down rotate-icon transition" id="descrizioneIcon"></i>
+              <span id="descrizioneText">Mostra descrizione</span>
+            </button>
+          </div>
+          <div class="collapse mb-3" id="descrizioneHasse">
+            <div class="card card-body bg-light border mt-2">
+              <p class="text-muted mb-2">Sia \((E, \leq)\) un <strong>insieme ordinato</strong>. La relazione di copertura \(\prec\) è definita su \(E\) come segue:</p>
+              <div class="centered-math">
+                \[
+                  e' \prec e'' \iff \bigl(e' \leq e'',\; e' \neq e''\bigr)
+                  \;\wedge\;
+                  \nexists\,c\in E:\;e' &lt; c &lt; e''.
+                \]
+              </div>
+              <p class="text-muted mt-2">In tal caso, si dice che \(e''\) <em>copre</em> \(e'\). Il <strong>diagramma di Hasse</strong> \(\Gamma(E,\prec)\) è il grafo diretto aciclico che rappresenta tale relazione, ottenuto collegando con un arco orientato ogni coppia \((e', e'')\) tale che \(e' \prec e''\).</p>
+              <p class="text-muted mb-0">Nel nostro caso consideriamo un insieme arbitrario oppure \((D_n, \delta)\), dove \(D_n\) è l’insieme dei divisori di \(n\) e \(\delta\) è la relazione di divisibilità.</p>
+            </div>
+          </div>
+          <script>
+            const descrizioneCollapse = document.getElementById('descrizioneHasse');
+            const descrizioneText = document.getElementById('descrizioneText');
+            const descrizioneIcon = document.getElementById('descrizioneIcon');
+
+            descrizioneCollapse.addEventListener('hide.bs.collapse', () => {
+              descrizioneText.textContent = 'Mostra descrizione';
+              descrizioneIcon.classList.remove('fa-chevron-up');
+              descrizioneIcon.classList.add('fa-chevron-down');
+            });
+            descrizioneCollapse.addEventListener('show.bs.collapse', () => {
+              descrizioneText.textContent = 'Nascondi descrizione';
+              descrizioneIcon.classList.remove('fa-chevron-down');
+              descrizioneIcon.classList.add('fa-chevron-up');
+            });
+          </script>
+          <!-- Dropdown to select input type -->
+          <div class="mb-3">
+            <label for="inputType" class="form-label fw-semibold">Seleziona tipo di insieme:</label>
+            <select id="inputType" class="form-select">
+              <option value="divisori">Divisori di 𝑛</option>
+              <option value="set">Insieme arbitrario</option>
+            </select>
+          </div>
+          <!-- Divisori input -->
+          <div class="mb-3" id="divisoriInput">
+            <label for="nField" class="form-label">Valore di \(n\):</label>
+            <math-field id="nField"
+                        delete-mode="off"
+                        default-mode="math"
+                        read-only="partial"
+                        class="math-input"
+                        style="font-size: 22px; display: inline-block; margin: 0 auto;">
+              \placeholder[n]{}
+            </math-field>
+          </div>
+          <!-- Custom set input -->
+          <div class="mb-3 d-none" id="setInput">
+            <label for="setField" class="form-label">Elementi dell'insieme (separati da virgola):</label>
+            <input type="text" id="setField" class="form-control text-center" placeholder="Es. 1,3,5,9,12">
+          </div>
+                  <div class="form-text mb-3" style="font-size: 0.85rem; margin-top: 10px;">
+                        L’algoritmo genera il diagramma di Hasse dell’insieme, ne analizza la struttura individuando proprietà fondamentali e verifica se è un reticolo controllando, \(\forall x, y\), l’esistenza di \( \text{sup}(x,y) \) e \( \inf(x,y) \)\( \in E \).
+                    </div>
+          <!-- Action buttons -->
+          <div class="text-center mt-3">
+            <button id="hasseButton" onclick="invioHasse()" class="btn btn-primary btn-sm px-3">
+              <i class="fas fa-play me-2"></i>Genera
+            </button>
+            <button onclick="resetHasse()" class="btn btn-secondary btn-sm px-3 ms-1">
+              <i class="fas fa-eraser me-2"></i>Pulisci
+            </button>
+          </div>
+    
+        </div>
+      </div>
+    </div>
+
+    <!-- Card di Output -->
+    <div class="col-12">
+        <div class="card output-card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-line me-2"></i>Output
+                </h5>
+            </div>
+            <div class="card-body" id="output">
+                <div class="empty-state text-center text-muted py-5">
+                    <i class="fas fa-microchip fa-3x mb-3 opacity-50"></i>
+                    <h6>Pronto per generare</h6>
+                    <p class="small">Inserisci n oppure un insieme e premi “Genera”.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function invioHasse() {
+    window.__scrollAfterResult = true;
+    const output = document.getElementById('output');
+
+    const tipo = document.getElementById('inputType').value;
+    let payload;
+    // Validate and build payload based on selection
+    if (tipo === 'divisori') {
+        const nVal = window.nField.getPromptValue("n")?.trim();
+        if (!nVal) {
+            output.innerHTML = createErrorAlert("Inserisci un valore per \\(n\\).");
+            MathJax.typesetPromise([output]).then(scrollToOutput);
+            scrollToOutput();
+            return;
+        }
+        payload = { type: 'n', n: parseInt(nVal, 10) };
+    } else {
+        const raw = document.getElementById('setField').value.trim();
+        if (!raw) {
+            output.innerHTML = createErrorAlert("Inserisci almeno un elemento nell'insieme.");
+            MathJax.typesetPromise([output]).then(scrollToOutput);
+            scrollToOutput();
+            return;
+        }
+        const arr = raw.split(',')
+            .map(x => x.trim())
+            .filter(x => x !== '')
+            .map(x => parseInt(x, 10));
+        payload = { type: 'set', set: arr };
+    }
+
+    const button = document.getElementById('hasseButton');
+    const originalHTML = button.innerHTML;
+
+    // Spinner
+    button.disabled = true;
+    button.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Generando...`;
+    output.innerHTML = `<div class="text-center my-3">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Generazione...</span>
+        </div>
+    </div>`;
+
+    // Chiamata all’API
+    fetch('/api/hasse-diagram', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(payload)
+    })
+    .then(r => r.json())
+    .then(res => {
+        if (!res.success) {
+            output.innerHTML = createErrorAlert(res.error);
+        } else {
+            // Build result container
+            const resultContainer = document.createElement('div');
+            resultContainer.classList.add('result-section');
+            // Step 0: Insieme inserito (first backend latex step)
+            if (Array.isArray(res.latex) && res.latex.length > 0) {
+                const first = res.latex[0];
+                resultContainer.insertAdjacentHTML('beforeend',
+                    `<p class="step-title"><b>0)</b> ${first.title}</p>
+                     <p class="centered-math">\\[${first.content}\\]</p>`
+                );
+                // Initialize LaTeX steps accumulator
+                let latexSteps = '';
+                // Include Step 0 for export
+                latexSteps += `0) ${first.title}\n\\[${first.content}\\]\n`;
+
+                // Step 1: Diagramma di Hasse (Cytoscape.js)
+            if (Array.isArray(res.nodes) && Array.isArray(res.edges)) {
+                console.log('[DEBUG] Nodi validi:', res.nodes);
+                const nodeIds = new Set(res.nodes.map(n => n.data.id));
+                const validEdges = res.edges.filter(e =>
+                    e.data && nodeIds.has(e.data.source) && nodeIds.has(e.data.target)
+                );
+                console.log('[DEBUG] Archi validi:', validEdges);
+
+                // Warn and skip if no valid edges
+                if (validEdges.length === 0) {
+                    resultContainer.insertAdjacentHTML('beforeend',
+                        `<div class="alert alert-warning"><strong>Attenzione:</strong> nessun arco valido da visualizzare.</div>`
+                    );
+                } else {
+                    resultContainer.insertAdjacentHTML('beforeend',
+                        `<p class="step-title"><b>1)</b> Diagramma di Hasse:</p>`
+                    );
+                    // Crea il contenitore visibile per l'SVG, senza margini extra
+                    const graphDiv = document.createElement('div');
+                    graphDiv.id = 'hasse-graph';
+                    graphDiv.style.width = '100%';
+                    graphDiv.style.height = 'auto';
+                    graphDiv.style.margin = '0';
+                    graphDiv.style.padding = '0';
+                    graphDiv.style.overflow = 'visible';
+                    graphDiv.style.position = 'relative';
+                    resultContainer.appendChild(graphDiv);
+
+                    // Delay initialization to ensure DOM is ready
+                    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                    setTimeout(() => {
+                        try {
+                            renderHasseDiagramFromPayload("hasse-graph", {
+                                elements: [...res.nodes, ...validEdges],
+                                layout: {
+                                    name: 'dagre',
+                                    fit: true,
+                                    padding: 20,
+                                    spacingFactor: 1.0,
+                                    nodeDimensionsIncludeLabels: true,
+                                    rankDir: 'BT',
+                                    rankSep: 50,
+                                    edgeSep: 20
+                                }
+                            });
+                        } catch (e) {
+                            console.error('[ERRORE Cytoscape]', e);
+                        }
+                    }, 100);
+                }
+                // Include Step 1 info in LaTeX export
+                latexSteps += `1) Diagramma di Hasse:\n`;
+                if (typeof res.tikz === 'string') {
+                    latexSteps += res.tikz + '\n';
+                }
+            }
+
+                // Subsequent analysis steps (start at index 2)
+                if (Array.isArray(res.latex) && res.latex.length > 1) {
+                    const analysis = res.latex.slice(1);
+                    analysis.forEach((step, idx) => {
+                        const num = idx + 2;
+                        // Append to export LaTeX
+                        latexSteps += `${num}) ${step.title}\n\\[${step.content}\\]\n`;
+                        // Render in HTML
+                        resultContainer.insertAdjacentHTML('beforeend',
+                            `<p class="step-title"><b>${num})</b> ${step.title}</p>
+                             <p class="centered-math">\\[${step.content}\\]</p>`
+                        );
+                    });
+                }
+
+                const nodeIds = new Set(res.nodes.map(n => n.data.id));
+                const validEdges = res.edges.filter(e =>
+                    e.data && nodeIds.has(e.data.source) && nodeIds.has(e.data.target)
+                );
+
+                // === Funzionalità Notebook ===
+                // Build payload per il pulsante "Salva nel notebook"
+                const notebookPayload = {
+                    title: 'Diagramma di Hasse',
+                    algorithm: 'Diagramma di Hasse',
+                    input: (payload?.type === 'n') ? `D_{${payload.n}}` : 'Insieme arbitrario',
+                    htmlOutput: resultContainer.outerHTML,   // HTML per GUI/PDF
+                    outputLatex: latexSteps,                 // sorgente TeX completa
+                    rawData: res,
+                    graphPayload: {
+                        elements: [...res.nodes, ...validEdges],
+                        layout: {
+                            name: 'dagre',
+                            fit: true,
+                            padding: 20,
+                            spacingFactor: 1.0,
+                            nodeDimensionsIncludeLabels: true,
+                            rankDir: 'BT',
+                            rankSep: 50,
+                            edgeSep: 20
+                        }
+                    }
+                };
+                // Div placeholder per il pulsante
+                const saveDiv = document.createElement('div');
+                saveDiv.id = 'hasseNotebookButton';
+                saveDiv.classList.add('mt-3');
+                resultContainer.appendChild(saveDiv);
+
+                // Attiva pulsante
+                if (typeof window.injectSaveButton === 'function') {
+                    window.injectSaveButton(saveDiv, notebookPayload);
+                }
+
+                // Salva dati correnti globali per export
+                window.currentExercise = notebookPayload;
+
+                // Espone latexSteps anche via dataset per eventuale export diretto
+                output.dataset.latex = latexSteps;
+
+                // Render into output
+                output.innerHTML = '';
+                output.appendChild(resultContainer);
+            }
+        }
+        MathJax.typesetPromise([output]).then(scrollToOutput);
+        button.disabled = false;
+        button.innerHTML = originalHTML;
+    })
+    .catch(err => {
+        output.innerHTML = createErrorAlert(err.message);
+        MathJax.typesetPromise([output]).then(scrollToOutput);
+        button.disabled = false;
+        button.innerHTML = originalHTML;
+    });
+}
+
+function resetHasse() {
+    if (window.nField && typeof window.nField.setValue === 'function') {
+        window.nField.setValue('\\placeholder[n]{}');
+    } else if (window.nField) {
+        window.nField.value = '';
+    }
+    document.getElementById('setField').value = '';
+    const output = document.getElementById('output');
+    output.innerHTML = `
+        <div class="empty-state text-center text-muted py-5">
+            <i class="fas fa-microchip fa-3x mb-3 opacity-50"></i>
+            <h6>Pronto per generare</h6>
+            <p class="small">Inserisci \\(n\\) oppure un insieme e premi “Genera”.</p>
+        </div>
+    `;
+}
+
+function createErrorAlert(message) {
+    return `
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>Errore:</strong> ${message}
+        </div>`;
+}
+
+function scrollToOutput() {
+    if (window.__scrollAfterResult) {
+        document.querySelector('.output-card').scrollIntoView({ behavior: 'smooth' });
+        window.__scrollAfterResult = false;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    window.nField = document.getElementById('nField');
+    resetHasse();
+});
+
+// Toggle between divisori and custom set inputs
+document.getElementById('inputType').addEventListener('change', (e) => {
+  const type = e.target.value;
+  document.getElementById('divisoriInput').classList.toggle('d-none', type !== 'divisori');
+  document.getElementById('setInput').classList.toggle('d-none', type !== 'set');
+});
+</script>
+
+<script src="{{ url_for('static', filename='js/anti-autoscroll.js') }}"></script>
+{% endblock %}

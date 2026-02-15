@@ -1,0 +1,232 @@
+{% extends "layout.html" %}
+
+<style>
+.result-section {
+  background: #fcfcff;
+  border: 1px solid #e6e6f0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+}
+</style>
+
+{% block topbar_title %}
+<h2 class="navbar-brand mb-0 fw-bold">
+    Identità di Bézout
+</h2>
+{% endblock %}
+
+{% block algorithm_content %}
+<!-- MathJax -->
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+<!-- MathLive -->
+<link rel="stylesheet" href="https://unpkg.com/mathlive/dist/mathlive.core.css">
+<script src="https://unpkg.com/mathlive/dist/mathlive.min.js"></script>
+
+<div class="row">
+  <!-- Input Card -->
+  <div class="col-12 mb-4">
+    <div class="card calculator-card shadow-sm">
+      <div class="card-header bg-primary text-white">
+        <h5 class="card-title mb-0">
+          <i class="fas fa-edit me-2"></i>Input
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="mb-3">
+          <button id="toggleDescrizione"
+                  class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#descrizioneBezout"
+                  aria-expanded="false"
+                  aria-controls="descrizioneBezout">
+            <i id="descrizioneIcon" class="fas fa-chevron-down rotate-icon"></i>
+            <span id="descrizioneText">Mostra descrizione</span>
+          </button>
+        </div>
+        <div id="descrizioneBezout" class="collapse mb-3">
+          <div class="card card-body mt-2">
+            <p class="text-muted mb-3">
+              Nell’identità di Bézout, per due interi coprimi \(a,b\), si cercano interi \(x,y\) tali che:
+            </p>
+            <div class="centered-math mb-3">
+              \[
+                ax + by = \gcd(a,b)
+              \]
+            </div>
+            <p class="text-muted mb-0">
+              Questa identità è fondamentale in teoria dei numeri e permette di calcolare il massimo comune divisore.
+            </p>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label for="bezoutField" class="form-label fw-semibold">Inserisci \(a\) e \(b\):</label>
+          <math-field id="bezoutField"
+                      delete-mode="off"
+                      default-mode="math"
+                      read-only="partial"
+                      class="math-input"
+                      style="font-size: 22px;">
+            \placeholder[a]{} \cdot x + \placeholder[b]{} \cdot y = \gcd(a,b)
+          </math-field>
+        </div>
+        <div class="form-text mb-3" style="font-size: 0.85rem; margin-top: 10px;">
+          L’algoritmo calcola automaticamente il massimo comun divisore \(\gcd(a,b)\) e, se possibile, restituisce interi \(x\) e \(y\) tali che
+          \(ax + by = \gcd(a,b)\).
+        </div>
+            
+
+        <div class="text-center mt-3">
+          <button id="bezoutButton" onclick="invioBezout()" class="btn btn-primary btn-sm px-3">
+            <i class="fas fa-play me-2"></i>Calcola
+          </button>
+          <button onclick="resetBezout()" class="btn btn-secondary btn-sm px-3 ms-1">
+            <i class="fas fa-eraser me-2"></i>Pulisci
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Output Card -->
+  <div class="col-12">
+    <div class="card output-card shadow-sm">
+      <div class="card-header bg-success text-white">
+        <h5 class="card-title mb-0">
+          <i class="fas fa-chart-line me-2"></i>Output
+        </h5>
+      </div>
+      <div class="card-body" id="output">
+        <div class="empty-state text-center text-muted py-5">
+          <i class="fas fa-calculator fa-3x mb-3 opacity-50"></i>
+          <h6>Pronto per calcolare</h6>
+          <p class="small">
+            Inserisci i valori e premi "Calcola".
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function invioBezout() {
+  const output = document.getElementById('output');
+  // retrieve a and b from editable placeholders
+  const aVal = window.bezoutField.getPromptValue("a")?.trim();
+  const bVal = window.bezoutField.getPromptValue("b")?.trim();
+  if (!aVal || !bVal) {
+    output.innerHTML = `<div class="alert alert-danger">Inserisci valori validi per \(a\) e \(b\).</div>`;
+    MathJax.typesetPromise([output]);
+    return;
+  }
+  const a = parseInt(aVal, 10);
+  const b = parseInt(bVal, 10);
+  const payload = { a, b };
+  // disable button
+  const btn = document.getElementById('bezoutButton');
+  const orig = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Calcolo...';
+  // show spinner
+  output.innerHTML = '<div class="text-center my-3"><div class="spinner-border text-primary"></div></div>';
+  output.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  // call API
+  fetch('/api/bezout-identity', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(payload)
+  })
+  .then(r => r.json())
+  .then(res => {
+    btn.disabled = false;
+    btn.innerHTML = orig;
+    if (!res.success) {
+      output.innerHTML = `<div class="alert alert-danger">${res.error}</div>`;
+    } else {
+      // choose steps array, fallback to res.latex if necessary
+      const stepsArray = Array.isArray(res.steps)
+        ? res.steps
+        : (Array.isArray(res.latex) ? res.latex : []);
+      if (stepsArray.length === 0) {
+        output.innerHTML = `<div class="alert alert-warning">Nessun passo disponibile.</div>`;
+      } else {
+        let latex = '';
+        const container = document.createElement('div');
+        stepsArray.forEach((step, i) => {
+          container.insertAdjacentHTML('beforeend',
+            `<p class="step-title"><b>${i+1})</b> ${step.title}</p>
+             <p class="centered-math">\\[${step.content}\\]</p>`
+          );
+          latex += `${i+1}) ${step.title}\n\\[${step.content}\\]\n`;
+        });
+        // === Funzionalità notebook Bézout ===
+        const notebookPayload = {
+          title: 'Identità di Bézout',
+          algorithm: 'Identità di Bézout',
+          input: `(${a},${b})`,
+          htmlOutput: container.outerHTML,
+          outputLatex: latex,
+          rawData: res
+        };
+        const saveDiv = document.createElement('div');
+        saveDiv.id = 'bezoutNotebookButton';
+        saveDiv.classList.add('mt-3');
+        container.appendChild(saveDiv);
+        if (typeof window.injectSaveButton === 'function') {
+          window.injectSaveButton(saveDiv, notebookPayload);
+        }
+        // Espone il TeX completo per export diretto
+        output.dataset.latex = latex;
+
+        output.innerHTML = '';
+        const wrapper = document.createElement('div');
+        wrapper.className = 'result-section';
+        wrapper.appendChild(container);
+        output.appendChild(wrapper);
+
+        MathJax.typesetPromise([output]);
+      }
+    }
+  })
+  .catch(err => {
+    btn.disabled = false;
+    btn.innerHTML = orig;
+    output.innerHTML = `<div class="alert alert-danger">${err.message}</div>`;
+  });
+}
+
+function resetBezout() {
+  window.bezoutField.setValue('\\placeholder[a]{} x + \\placeholder[b]{}  y = \\operatorname{gcd}(a,b)');
+  const output = document.getElementById('output');
+  output.innerHTML = `
+    <div class="empty-state text-center text-muted py-5">
+      <i class="fas fa-calculator fa-3x mb-3 opacity-50"></i>
+      <h6>Pronto per calcolare</h6>
+      <p class="small">Inserisci i valori e premi "Calcola".</p>
+    </div>`;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  window.bezoutField = document.getElementById('bezoutField');
+  const descrCollapse = document.getElementById('descrizioneBezout');
+  const descrText = document.getElementById('descrizioneText');
+  const descrIcon = document.getElementById('descrizioneIcon');
+  descrCollapse.addEventListener('hide.bs.collapse', () => {
+    descrText.textContent = 'Mostra descrizione';
+    descrIcon.classList.remove('fa-chevron-up');
+    descrIcon.classList.add('fa-chevron-down');
+  });
+  descrCollapse.addEventListener('show.bs.collapse', () => {
+    descrText.textContent = 'Nascondi descrizione';
+    descrIcon.classList.remove('fa-chevron-down');
+    descrIcon.classList.add('fa-chevron-up');
+  });
+  resetBezout();
+});
+</script>
+{% endblock %}

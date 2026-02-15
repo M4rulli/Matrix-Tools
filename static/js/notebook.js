@@ -4,8 +4,8 @@ function isMobileDevice() {
     return window.innerWidth <= 768;
 }
 
-// Notebook System - Gestione completa del quaderno matematico
-// File separato per modularità e manutenibilità
+// Notebook System - Full management of the mathematical notebook
+// Separate file for modularity and maintainability
 
 class NotebookManager {
     constructor() {
@@ -17,9 +17,9 @@ class NotebookManager {
     }
 
     init() {
-        // 1. Carica il quaderno
+        // 1. Carica il notebook
         this.loadNotebook();
-        // 2. Aggiorna subito il contatore
+        // 2. Update subito il contatore
         this.updateNotebookCount();
         // 3. Setup event listeners
         this.setupEventListeners();
@@ -40,7 +40,7 @@ class NotebookManager {
         });
     }
 
-    // Salva esercizio nel quaderno
+    // Salva esercizio nel notebook
     saveToNotebook() {
         // Previeni doppio salvataggio
         if (this.isSaving) {
@@ -63,14 +63,14 @@ class NotebookManager {
             return;
         }
         
-        // Rimuovi il bottone salva dal contenuto da salvare
+        // Remove il bottone salva dal contenuto da salvare
         const outputContent = outputDiv.cloneNode(true);
         const saveButton = outputContent.querySelector('.save-to-notebook-btn');
         if (saveButton) {
             saveButton.remove();
         }
 
-        // Rimuovi il diagramma SVG statico se presente
+        // Remove il diagramma SVG statico if presente
         const oldGraph = outputContent.querySelector('#hasse-graph');
         if (oldGraph) oldGraph.remove();
 
@@ -85,93 +85,99 @@ class NotebookManager {
             titleEl.parentNode.insertBefore(wrapper, titleEl.nextSibling);
         }
 
-        // === Calcolo titolo incrementale per ogni tipo ===
+        // === Computation titolo incrementale per ogni tipo ===
         let exerciseTitle = this.generateExerciseTitle();
         const path = window.location.pathname;
 
-        if (path.includes('potenze-modulari')) {
+        if (path.includes('modular-powers')) {
             const count = this.notebookData.filter(ex =>
                 ex.algorithm && ex.algorithm.includes('Potenza Modulare')
             ).length + 1;
             exerciseTitle = `Potenza Modulare ${count}`;
-        } else if (path.includes('diagramma-hasse')) {
+        } else if (path.includes('hasse-diagram')) {
             const count = this.notebookData.filter(ex =>
                 ex.algorithm && ex.algorithm.includes('Diagramma di Hasse')
             ).length + 1;
             exerciseTitle = `Diagramma di Hasse ${count}`;
-        } else if (path.includes('polinomi-booleani')) {
+        } else if (path.includes('boolean-polynomials')) {
             const count = this.notebookData.filter(ex =>
                 ex.algorithm && ex.algorithm.includes('Polinomi Booleani')
             ).length + 1;
             exerciseTitle = `Polinomio Booleano ${count}`;
-        } else if (path.includes('linearizzazione')) {
+        } else if (path.includes('linearization')) {
             const count = this.notebookData.filter(ex =>
                 ex.algorithm && ex.algorithm.includes('Linearizzazione Sistema')
             ).length + 1;
             exerciseTitle = `Linearizzazione Sistema ${count}`;
-        } else if (path.includes('sistemi-lineari')) {
+        } else if (path.includes('linear-systems')) {
             const count = this.notebookData.filter(ex =>
                 ex.title && ex.title.startsWith('Sistema Lineare')
             ).length + 1;
             exerciseTitle = `Sistema Lineare ${count}`;
-        } else if (path.includes('equazioni-differenziali')) {
+        } else if (path.includes('differential-equations')) {
             const count = this.notebookData.filter(ex =>
                 ex.algorithm && ex.algorithm.includes('Equazione Differenziale')
             ).length + 1;
             exerciseTitle = `Equazione Differenziale ${count}`;
-        } else if (path.includes('equazioni-differenze')) {
+        } else if (path.includes('difference-equations')) {
             const count = this.notebookData.filter(ex =>
                 ex.algorithm && ex.algorithm.includes('Equazione alle Differenze')
             ).length + 1;
             exerciseTitle = `Equazione alle Differenze ${count}`;
         }
-        else if (path.includes('studio-funzione')) {
+        else if (path.includes('function-study')) {
             const count = this.notebookData.filter(ex =>
                 ex.algorithm && ex.algorithm.includes('Studio di Funzione')
             ).length + 1;
             exerciseTitle = `Studio di Funzione ${count}`;
         }
-        else if (path.includes('autovalori-autovettori')) {
+        else if (path.includes('eigenvalues-eigenvectors')) {
             const count = this.notebookData.filter(ex =>
                 ex.title && ex.title.startsWith('Autovalori e Autovettori')
             ).length + 1;
             exerciseTitle = `Autovalori e Autovettori ${count}`;
         }
-        else if (path.includes('determinante-laplace')) {
+        else if (path.includes('laplace-determinant')) {
             const count = this.notebookData.filter(ex =>
                 ex.title && ex.title.startsWith('Determinante con Laplace')
             ).length + 1;
             exerciseTitle = `Determinante con Laplace ${count}`;
         }
-        else if (path.includes('decomposizione-spettrale')) {
+        else if (path.includes('spectral-decomposition')) {
             const count = this.notebookData.filter(ex =>
                 ex.title && ex.title.startsWith('Decomposizione spettrale')
             ).length + 1;
             exerciseTitle = `Decomposizione Spettrale ${count}`;
         }
-        else if (path.includes('teorema-cinese')) {
+        else if (path.includes('chinese-remainder')) {
             const count = this.notebookData.filter(ex =>
                 ex.algorithm && ex.algorithm.includes('Teorema Cinese del Resto')
             ).length + 1;
             exerciseTitle = `Teorema Cinese del Resto ${count}`;
         }
-        else if (path.includes('identita-bezout')) {
+        else if (path.includes('bezout-identity')) {
             const countBezout = this.notebookData.filter(ex =>
                 ex.algorithm && ex.algorithm.includes('Identità di Bézout')
             ).length + 1;
             exerciseTitle = `Identità di Bézout ${countBezout}`;
         }
-        else if (path.includes('simplesso')) {
+        else if (path.includes('simplex')) {
             const count = this.notebookData.filter(ex =>
                 ex.title && ex.title.startsWith('Metodo del Simplesso')
             ).length + 1;
             exerciseTitle = `Metodo del Simplesso ${count}`;
         }
-        else if (path.includes('condizioni-complementari')) {
+        else if (path.includes('complementary-conditions')) {
             const count = this.notebookData.filter(ex =>
                 ex.title && ex.title.startsWith('Condizioni di Complementarità')
             ).length + 1;
             exerciseTitle = `Condizioni di Complementarità ${count}`;
+        }
+        else if (path.includes('dynamical-systems')) {
+            const count = this.notebookData.filter(ex =>
+                ex.title && ex.title.startsWith('Sistemi Dinamici')
+            ).length + 1;
+            exerciseTitle = `Sistemi Dinamici ${count}`;
         }
 
         const exercise = {
@@ -209,7 +215,7 @@ class NotebookManager {
 
     // Genera titolo automatico per l'esercizio
     generateExerciseTitle() {
-        // Se è disponibile window.currentExercise, usa quel titolo
+        // If window.currentExercise is available, use that title
         if (window.currentExercise && window.currentExercise.title) {
             return window.currentExercise.title;
         }
@@ -218,47 +224,50 @@ class NotebookManager {
         const path = window.location.pathname;
         let exerciseType = "Esercizio Matematico";
         
-        if (path.includes('potenze-modulari')) {
+        if (path.includes('modular-powers')) {
             exerciseType = "Calcolo Potenza Modulare";
-        } else if (path.includes('diagramma-hasse')) {
+        } else if (path.includes('hasse-diagram')) {
             exerciseType = "Diagramma di Hasse";
-        } else if (path.includes('polinomi-booleani')) {
+        } else if (path.includes('boolean-polynomials')) {
             exerciseType = "Polinomi Booleani";
-        } else if (path.includes('linearizzazione')) {
+        } else if (path.includes('linearization')) {
             exerciseType = "Linearizzazione Sistema";
-        } else if (path.includes('sistemi-lineari')) {
+        } else if (path.includes('linear-systems')) {
             exerciseType = "Sistema Lineare";
-        } else if (path.includes('equazioni-differenziali')) {
+        } else if (path.includes('differential-equations')) {
             exerciseType = "Equazione Differenziale";
-        } else if (path.includes('equazioni-differenze')) {
+        } else if (path.includes('difference-equations')) {
             exerciseType = "Equazione alle Differenze";
         }
-        else if (path.includes('studio-funzione')) {
+        else if (path.includes('function-study')) {
             exerciseType = "Studio di Funzione";
         }
-        else if (path.includes('autovalori-autovettori')) {
+        else if (path.includes('eigenvalues-eigenvectors')) {
             exerciseType = "Autovalori e Autovettori";
         }
-        else if (path.includes('determinante-laplace')) {
+        else if (path.includes('laplace-determinant')) {
             exerciseType = "Determinante con Laplace";
         }
-        else if (path.includes('teorema-cinese')) {
+        else if (path.includes('chinese-remainder')) {
             exerciseType = "Teorema Cinese del Resto";
         }
-        else if (path.includes('identita-bezout')) {
+        else if (path.includes('bezout-identity')) {
             exerciseType = "Identità di Bézout";
         }
-        else if (path.includes('simplesso')) {
+        else if (path.includes('simplex')) {
             exerciseType = "Metodo del Simplesso";
         }
-        else if (path.includes('condizioni-complementari')) {
+        else if (path.includes('complementary-conditions')) {
             exerciseType = "Condizioni di Complementarità";
+        }
+        else if (path.includes('dynamical-systems')) {
+            exerciseType = "Sistemi Dinamici";
         }
         
         return exerciseType;
     }
 
-    // Apri modal del quaderno
+    // Apri modal del notebook
     openNotebook() {
         this.loadNotebook();
         this.renderNotebook();
@@ -267,12 +276,12 @@ class NotebookManager {
         
         // Aggiungi event listener per pulire alla chiusura
         modalElement.addEventListener('hidden.bs.modal', () => {
-            // Rimuovi classi modal Bootstrap
+            // Remove classi modal Bootstrap
             document.body.classList.remove('modal-open');
             document.body.style.overflow = '';
             document.body.style.paddingRight = '';
             
-            // Rimuovi backdrop
+            // Remove backdrop
             const backdrop = document.querySelector('.modal-backdrop');
             if (backdrop) {
                 backdrop.remove();
@@ -288,7 +297,7 @@ class NotebookManager {
         modal.show();
     }
 
-    // Renderizza il contenuto del quaderno
+    // Renderizza il contenuto del notebook
     renderNotebook() {
         const notebookList = document.getElementById('notebookList');
         const notebookViewer = document.getElementById('notebookViewer');
@@ -308,10 +317,10 @@ class NotebookManager {
         // Renderizza indice
         this.renderIndex();
         
-        // Aggiorna i badge nell'header
+        // Update i badge nell'header
         this.updateHeaderBadges();
         
-        // Mostra primo esercizio se nessuno è selezionato
+        // Show the first exercise if none is selected
         if (this.currentExerciseIndex === -1 && this.notebookData.length > 0) {
             this.currentExerciseIndex = 0;
         }
@@ -339,11 +348,11 @@ class NotebookManager {
             </div>
         `).join('');
         
-        // Aggiorna i badge nell'header
+        // Update i badge nell'header
         this.updateHeaderBadges();
     }
 
-    // Aggiorna i badge informativi nell'header
+    // Update i badge informativi nell'header
     updateHeaderBadges() {
         const savedCountBadge = document.getElementById('savedCountBadge');
         const lastUpdateBadge = document.getElementById('lastUpdateBadge');
@@ -384,7 +393,7 @@ class NotebookManager {
         
         if (!notebookExerciseContent) return;
         
-        // Aggiorna i bottoni di navigazione
+        // Update i bottoni di navigazione
         this.updateNavigationButtons();
         
         if (this.currentExerciseIndex >= 0 && this.currentExerciseIndex < this.notebookData.length) {
@@ -418,7 +427,7 @@ class NotebookManager {
                     exercise.graphPayload,
                     document.documentElement.getAttribute('data-theme') || 'light'
                 );
-                // Nuova gestione ResizeObserver e fallback
+                // New ResizeObserver and fallback handling
                 const wrapper = document.getElementById(exercise.placeholderId);
                 if (wrapper) {
                     const observer = new ResizeObserver(entries => {
@@ -444,7 +453,7 @@ class NotebookManager {
                     }, 500);
                 }
             }
-            // Re-renderizza MathJax se presente
+            // Re-renderizza MathJax if presente
             if (window.MathJax && window.MathJax.typesetPromise) {
                 window.MathJax.typesetPromise([notebookExerciseContent]).catch((err) => {
                     console.warn('MathJax render error:', err);
@@ -465,7 +474,7 @@ class NotebookManager {
         }
     }
 
-    // Aggiorna lo stato dei bottoni di navigazione
+    // Update lo state dei bottoni di navigazione
     updateNavigationButtons() {
         const prevBtn = document.querySelector('[onclick="notebookManager.previousExercise()"]');
         const nextBtn = document.querySelector('[onclick="notebookManager.nextExercise()"]');
@@ -528,7 +537,7 @@ class NotebookManager {
         if (confirm('Sei sicuro di voler eliminare questo esercizio?')) {
             this.notebookData.splice(index, 1);
             
-            // Aggiusta l'indice corrente se necessario
+            // Aggiusta l'indice corrente if necessario
             if (this.currentExerciseIndex >= index) {
                 this.currentExerciseIndex--;
             }
@@ -616,7 +625,7 @@ class NotebookManager {
             const saved = localStorage.getItem(this.storageKey);
             if (saved && saved !== 'undefined' && saved !== 'null') {
                 const parsed = JSON.parse(saved);
-                // Imposta direttamente notebookData se valido, altrimenti array vuoto
+                // Imposta direttamente notebookData if valido, altrimenti array vuoto
                 this.notebookData = Array.isArray(parsed) ? parsed : [];
             } else {
                 this.notebookData = [];
@@ -624,7 +633,7 @@ class NotebookManager {
         } catch (error) {
             console.warn('Errore caricamento quaderno:', error);
             this.notebookData = [];
-            // Pulisci localStorage corrotto
+            // Clear corrupted localStorage
             localStorage.removeItem(this.storageKey);
         }
     }
@@ -634,13 +643,13 @@ class NotebookManager {
     }
 
     updateNotebookCount() {
-        // Aggiorna contatore nella sidebar
+        // Update contatore nella sidebar
         const countElement = document.getElementById('notebookCount');
         if (countElement) {
             countElement.textContent = this.notebookData.length;
         }
 
-        // Aggiorna badge nel modal del quaderno
+        // Update badge nel modal del notebook
         const savedCountBadge = document.getElementById('savedCountBadge');
         if (savedCountBadge) {
             savedCountBadge.textContent = this.notebookData.length;
@@ -657,7 +666,7 @@ class NotebookManager {
     }
 
     showNotification(message, type = 'info') {
-        // Rimuovi notifiche esistenti
+        // Remove notifiche esistenti
         const existingToasts = document.querySelectorAll('.toast-notification');
         existingToasts.forEach(toast => toast.remove());
 
@@ -672,10 +681,10 @@ class NotebookManager {
 
         document.body.appendChild(toast);
 
-        // Mostra il toast
+        // Display the toast
         setTimeout(() => toast.classList.add('show'), 100);
 
-        // Rimuovi il toast dopo 3 secondi
+        // Remove il toast dopo 3 secondi
         setTimeout(() => {
             toast.classList.remove('show');
             setTimeout(() => toast.remove(), 300);
@@ -694,7 +703,7 @@ class NotebookManager {
 }
 
 /**
- * Inietta il bottone “Aggiungi al quaderno” nell’elemento di output
+ * Inietta il bottone “Add to notebook” nell’elemento di output
  * e registra i dati in window.currentExercise per NotebookManager
  *
  * @param {HTMLElement} outputDiv – il div che contiene l’HTML di risultato
@@ -706,10 +715,26 @@ window.injectSaveButton = function (outputDiv, payload) {
     // 1) Salva i dati per il notebook
     window.currentExercise = payload;
 
-    // 2) Evita duplicati
-    if (outputDiv.querySelector('.save-to-notebook-btn')) return;
+    // 2) Resolve the output card body (button must stay fixed at bottom-right of card body)
+    const cardBody =
+        outputDiv.closest('.card-body') ||
+        outputDiv.closest('.output-card')?.querySelector('.card-body') ||
+        document.getElementById('output') ||
+        outputDiv;
 
-    // 3) Crea il bottone
+    if (!cardBody) return;
+
+    // Ensure absolute button anchors to the full card body, not to nested result sections.
+    const style = window.getComputedStyle(cardBody);
+    if (style.position === 'static') {
+        cardBody.style.position = 'relative';
+    }
+
+    // 3) Evita duplicati: keep only one save button per output card body
+    cardBody.querySelectorAll('.save-to-notebook-btn').forEach((btn) => btn.remove());
+    outputDiv.querySelectorAll('.save-to-notebook-btn').forEach((btn) => btn.remove());
+
+    // 4) Crea il bottone
     const btn = document.createElement('button');
     btn.className = 'save-to-notebook-btn';
     btn.title = 'Aggiungi al quaderno';
@@ -723,14 +748,14 @@ window.injectSaveButton = function (outputDiv, payload) {
         }
     };
 
-    // 4) Inserisci nel DOM e mostra
-    outputDiv.appendChild(btn);
+    // 5) Insert into the card body and display it
+    cardBody.appendChild(btn);
     btn.style.display = 'flex';
 };
 
-// Inizializza il manager del quaderno quando il DOM è pronto
+// Initialize il manager del notebook quando il DOM è pronto
 let notebookManager;
-document.addEventListener('DOMContentLoaded', () => {
+function initializeNotebookManager() {
     // Leggi valore salvato per evitare transizione 0→x
     const storedCount = parseInt(localStorage.getItem('mathNotebookCount') || '0');
     const desktopTarget = document.getElementById('exercise-count-desktop');
@@ -738,13 +763,19 @@ document.addEventListener('DOMContentLoaded', () => {
     if (desktopTarget) desktopTarget.textContent = storedCount;
     if (mobileTarget) mobileTarget.textContent = storedCount;
 
-    // Inizializza tutto normalmente
+    // Initialize tutto normalmente
     notebookManager = new NotebookManager();
     window.notebookManager = notebookManager;
     console.log('NotebookManager initialized and exposed globally');
-});
+}
 
-// Funzioni globali per compatibilità con il codice esistente
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeNotebookManager);
+} else {
+    initializeNotebookManager();
+}
+
+// Funzioni globali for compatibility with il codice esistente
 function saveToNotebook() {
     if (notebookManager) {
         notebookManager.saveToNotebook();

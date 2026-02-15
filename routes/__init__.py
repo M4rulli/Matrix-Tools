@@ -1,23 +1,24 @@
-from .algebra_logica.potenze_modulari import potenze_modulari_bp
-from .algebra_logica.diagramma_hasse import diagramma_hasse_bp
-from .algebra_logica.polinomi_booleani import polinomi_booleani_bp
-from .algebra_logica.teorema_cinese_resto import teorema_cinese_resto_bp
-from .algebra_logica.identita_bezout import identita_bezout_bp
+from .algebra_logic.modular_powers import potenze_modulari_bp
+from .algebra_logic.hasse_diagram import diagramma_hasse_bp
+from .algebra_logic.boolean_polynomials import polinomi_booleani_bp
+from .algebra_logic.chinese_remainder_theorem import teorema_cinese_resto_bp
+from .algebra_logic.bezout_identity import identita_bezout_bp
 
-from .algerba_lineare.determinante_laplace import det_laplace_bp
-from .algerba_lineare.autovalori_autovettori import eigen_bp
-from .algerba_lineare.sistemi_lineari import syslin_bp
+from .linear_algebra.laplace_determinant import det_laplace_bp
+from .linear_algebra.eigenvalues_eigenvectors import eigen_bp
+from .linear_algebra.linear_systems import syslin_bp
 
-from .controlli.linearizzazione import linearizzazione_bp
-from .controlli.decomposizione_spettrale import spectral_bp
-from .controlli.equazioni_differenziali import equazioni_differenziali_bp
-from .controlli.equazioni_differenze import equazioni_differenze_bp
+from .controls.linearization import linearizzazione_bp
+from .controls.spectral_decomposition import spectral_bp
+from .controls.differential_equations import equazioni_differenziali_bp
+from .controls.difference_equations import equazioni_differenze_bp
+from .controls.dynamical_systems import sistemi_dinamici_bp
 
-from .ricerca_operativa.simplesso import simplesso_bp
-from .ricerca_operativa.condizioni_complementari import cc_bp
+from .operations_research.simplex import simplesso_bp
+from .operations_research.complementary_conditions import cc_bp
 
-from .analisi.studio_funzione import studio_funzione_bp
-from .analisi.integrali import integrali_bp
+from .analysis.function_study import studio_funzione_bp
+from .analysis.integrals import integrali_bp
 
 def register_routes(app):
     app.register_blueprint(potenze_modulari_bp)
@@ -27,6 +28,7 @@ def register_routes(app):
     app.register_blueprint(spectral_bp)
     app.register_blueprint(equazioni_differenziali_bp)
     app.register_blueprint(equazioni_differenze_bp)
+    app.register_blueprint(sistemi_dinamici_bp)
     app.register_blueprint(teorema_cinese_resto_bp)
     app.register_blueprint(identita_bezout_bp)
     app.register_blueprint(det_laplace_bp)

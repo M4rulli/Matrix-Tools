@@ -1,0 +1,103 @@
+<nav id="sidebar" class="sidebar" aria-label="Sidebar navigazione">
+  <div class="sidebar-header">
+    <h4 class="mb-0 d-flex align-items-center">
+      <i class="fas fa-calculator me-1"></i>
+      <a class="text-reset text-decoration-none" data-home-link href="/">Matrix Tools</a>
+    </h4>
+  </div>
+
+  <div class="sidebar-search">
+    <div class="search-container">
+      <i class="fas fa-search search-icon"></i>
+      <input type="text" id="sidebarSearch-static" class="search-input" placeholder="Cerca algoritmi..." autocomplete="off">
+      <div class="search-clear" id="searchClear-static" style="display: none;">
+        <i class="fas fa-times"></i>
+      </div>
+    </div>
+    <div class="search-results" id="searchResults-static" style="display: none;"></div>
+  </div>
+
+  <div class="sidebar-content">
+    <div class="notebook-section p-3">
+      <button class="notebook-button" onclick="openNotebook()" title="Apri Quaderno">
+        <i class="fas fa-book notebook-icon"></i>
+        <span class="notebook-text">Quaderno</span>
+        <span class="notebook-count" id="exercise-count-desktop">0</span>
+      </button>
+      <span id="notebookCount" style="display:none;">0</span>
+    </div>
+
+    <div class="category-section">
+      <button class="category-header" type="button" data-section-toggle="controls">
+        <div class="category-title"><i class="fas fa-cogs category-icon"></i><span>Teoria dei Controlli</span></div>
+        <i class="fas fa-chevron-down chevron-icon"></i>
+      </button>
+      <div class="algorithm-container collapsed" data-section="controls">
+        <ul class="algorithm-list">
+          <li><a class="algorithm-link" data-slug="linearization.html" href="#"><i class="fas fa-project-diagram me-2"></i><span>Linearizzazione</span></a></li>
+          <li><a class="algorithm-link" data-slug="spectral-decomposition.html" href="#"><i class="fas fa-braille me-2"></i><span>Decomposizione Spettrale</span></a></li>
+          <li><a class="algorithm-link" data-slug="differential-equations.html" href="#"><i class="fas fa-wave-square me-2"></i><span>Equazioni Differenziali</span></a></li>
+          <li><a class="algorithm-link" data-slug="difference-equations.html" href="#"><i class="fas fa-step-forward me-2"></i><span>Equazioni alle Differenze</span></a></li>
+          <li><a class="algorithm-link" data-slug="dynamical-systems.html" href="#"><i class="fas fa-sliders-h me-2"></i><span>Sistemi Dinamici</span></a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="category-section">
+      <button class="category-header" type="button" data-section-toggle="algebra_logic">
+        <div class="category-title"><i class="fas fa-square-root-alt category-icon"></i><span>Algebra e Logica</span></div>
+        <i class="fas fa-chevron-down chevron-icon"></i>
+      </button>
+      <div class="algorithm-container collapsed" data-section="algebra_logic">
+        <ul class="algorithm-list">
+          <li><a class="algorithm-link" data-slug="modular-powers.html" href="#"><i class="fas fa-divide me-2"></i><span>Potenze Modulari</span></a></li>
+          <li><a class="algorithm-link" data-slug="hasse-diagram.html" href="#"><i class="fas fa-cubes me-2"></i><span>Diagramma di Hasse</span></a></li>
+          <li><a class="algorithm-link" data-slug="boolean-polynomials.html" href="#"><i class="fas fa-project-diagram me-2"></i><span>Polinomi Booleani</span></a></li>
+          <li><a class="algorithm-link" data-slug="chinese-remainder-theorem.html" href="#"><i class="fas fa-chess-board me-2"></i><span>Teorema Cinese del Resto</span></a></li>
+          <li><a class="algorithm-link" data-slug="bezout-identity.html" href="#"><i class="fas fa-equals me-2"></i><span>Identità di Bézout</span></a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="category-section">
+      <button class="category-header" type="button" data-section-toggle="linear_algebra">
+        <div class="category-title"><i class="fas fa-border-all category-icon"></i><span>Algebra Lineare</span></div>
+        <i class="fas fa-chevron-down chevron-icon"></i>
+      </button>
+      <div class="algorithm-container collapsed" data-section="linear_algebra">
+        <ul class="algorithm-list">
+          <li><a class="algorithm-link" data-slug="laplace-determinant.html" href="#"><i class="fas fa-dice-four me-2"></i><span>Determinante con Laplace</span></a></li>
+          <li><a class="algorithm-link" data-slug="eigenvalues-eigenvectors.html" href="#"><i class="fas fa-cubes me-2"></i><span>Autovalori e Autovettori</span></a></li>
+          <li><a class="algorithm-link" data-slug="linear-systems.html" href="#"><i class="fas fa-equals me-2"></i><span>Sistemi Lineari</span></a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="category-section">
+      <button class="category-header" type="button" data-section-toggle="operations_research">
+        <div class="category-title"><i class="fas fa-chart-line category-icon"></i><span>Ricerca Operativa</span></div>
+        <i class="fas fa-chevron-down chevron-icon"></i>
+      </button>
+      <div class="algorithm-container collapsed" data-section="operations_research">
+        <ul class="algorithm-list">
+          <li><a class="algorithm-link" data-slug="simplex.html" href="#"><i class="fas fa-table me-2"></i><span>Metodo del Simplesso</span></a></li>
+          <li><a class="algorithm-link" data-slug="complementary-conditions.html" href="#"><i class="fas fa-handshake me-2"></i><span>Condizioni di Complementarità</span></a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="category-section">
+      <button class="category-header" type="button" data-section-toggle="analysis">
+        <div class="category-title"><i class="fas fa-chart-area category-icon"></i><span>Analisi Matematica</span></div>
+        <i class="fas fa-chevron-down chevron-icon"></i>
+      </button>
+      <div class="algorithm-container collapsed" data-section="analysis">
+        <ul class="algorithm-list">
+          <li><a class="algorithm-link" data-slug="function-study.html" href="#"><i class="fas fa-wave-square me-2"></i><span>Studio di Funzione</span></a></li>
+          <li><a class="algorithm-link" data-slug="integrals.html" href="#"><i class="fas fa-integral me-2"></i><span>Integrali</span></a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</nav>
+<div id="sidebarOverlay" aria-hidden="true"></div>

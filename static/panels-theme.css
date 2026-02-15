@@ -1,0 +1,308 @@
+:root {
+  --site-grad-a: #eaf2ff;
+  --site-grad-b: #edf7f3;
+  --site-grad-c: #f7fbff;
+
+  --glass-nav-bg: rgba(255, 255, 255, 0.68);
+  --glass-nav-border: rgba(255, 255, 255, 0.62);
+  --glass-nav-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+
+  --panel-surface: rgba(255, 255, 255, 0.94);
+  --panel-surface-soft: rgba(248, 250, 252, 0.96);
+  --panel-border: rgba(255, 255, 255, 0.75);
+  --panel-title: #f8fafc;
+  --panel-text: #0f172a;
+  --panel-muted: #475569;
+
+  --panel-input-header-a: #0f766e;
+  --panel-input-header-b: #0e7490;
+  --panel-output-header-a: #166534;
+  --panel-output-header-b: #15803d;
+
+  --panel-focus-ring: rgba(15, 118, 110, 0.2);
+  --panel-shadow: 0 10px 26px rgba(15, 23, 42, 0.08), 0 -6px 16px rgba(15, 23, 42, 0.05);
+  --panel-shadow-hover: 0 18px 38px rgba(15, 23, 42, 0.12), 0 -8px 20px rgba(15, 23, 42, 0.07);
+
+  --toggle-bg: rgba(255, 255, 255, 0.62);
+  --toggle-border: rgba(148, 163, 184, 0.45);
+  --toggle-text: #334155;
+  --toggle-bg-hover: rgba(255, 255, 255, 0.8);
+
+  --field-bg: rgba(255, 255, 255, 0.82);
+  --field-border: rgba(203, 213, 225, 0.7);
+}
+
+[data-theme="dark"] {
+  --site-grad-a: #0b1220;
+  --site-grad-b: #111827;
+  --site-grad-c: #101726;
+
+  --glass-nav-bg: rgba(15, 23, 42, 0.62);
+  --glass-nav-border: rgba(51, 65, 85, 0.7);
+  --glass-nav-shadow: 0 10px 28px rgba(2, 6, 23, 0.45);
+
+  --panel-surface: rgba(15, 23, 42, 0.6);
+  --panel-surface-soft: rgba(30, 41, 59, 0.72);
+  --panel-border: rgba(71, 85, 105, 0.55);
+  --panel-title: #e2e8f0;
+  --panel-text: #e2e8f0;
+  --panel-muted: #94a3b8;
+
+  --panel-input-header-a: #0f766e;
+  --panel-input-header-b: #0f766e;
+  --panel-output-header-a: #166534;
+  --panel-output-header-b: #166534;
+
+  --panel-focus-ring: rgba(45, 212, 191, 0.24);
+  --panel-shadow: 0 10px 26px rgba(2, 6, 23, 0.4), 0 -6px 16px rgba(2, 6, 23, 0.35);
+  --panel-shadow-hover: 0 18px 38px rgba(2, 6, 23, 0.55), 0 -8px 20px rgba(2, 6, 23, 0.42);
+
+  --toggle-bg: rgba(30, 41, 59, 0.68);
+  --toggle-border: rgba(100, 116, 139, 0.6);
+  --toggle-text: #cbd5e1;
+  --toggle-bg-hover: rgba(51, 65, 85, 0.82);
+
+  --field-bg: rgba(30, 41, 59, 0.76);
+  --field-border: rgba(71, 85, 105, 0.72);
+}
+
+body {
+  font-family: "Manrope", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(14, 116, 144, 0.16) 0%, transparent 35%),
+    radial-gradient(circle at 86% 14%, rgba(21, 128, 61, 0.12) 0%, transparent 34%),
+    linear-gradient(145deg, var(--site-grad-a) 0%, var(--site-grad-b) 45%, var(--site-grad-c) 100%) !important;
+}
+
+#content .navbar {
+  background: var(--glass-nav-bg) !important;
+  border: 1px solid var(--glass-nav-border);
+  box-shadow: var(--glass-nav-shadow);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.sidebar {
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-right: 1px solid rgba(148, 163, 184, 0.24);
+}
+
+.card.calculator-card,
+.card.output-card {
+  border: 1px solid var(--panel-border) !important;
+  border-radius: 18px !important;
+  background: var(--panel-surface) !important;
+  box-shadow: var(--panel-shadow) !important;
+  overflow: hidden;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.card.calculator-card:hover,
+.card.output-card:hover {
+  box-shadow: var(--panel-shadow-hover) !important;
+}
+
+.card.calculator-card > .card-header,
+.card.output-card > .card-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18) !important;
+  padding: 0.95rem 1.2rem !important;
+}
+
+.card.calculator-card > .card-header.bg-primary {
+  background: linear-gradient(135deg, var(--panel-input-header-a) 0%, var(--panel-input-header-b) 100%) !important;
+  color: var(--panel-title) !important;
+}
+
+.card.calculator-card > .card-header.modern-header {
+  background: linear-gradient(135deg, var(--panel-input-header-a) 0%, var(--panel-input-header-b) 100%) !important;
+  color: var(--panel-title) !important;
+}
+
+.card.output-card > .card-header.bg-success {
+  background: linear-gradient(135deg, var(--panel-output-header-a) 0%, var(--panel-output-header-b) 100%) !important;
+  color: var(--panel-title) !important;
+}
+
+.card.calculator-card .card-title,
+.card.output-card .card-title {
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+.card.calculator-card > .card-body,
+.card.output-card > .card-body {
+  color: var(--panel-text);
+  background: var(--panel-surface-soft);
+  padding: 1.15rem;
+}
+
+[data-theme="dark"] .card.calculator-card > .card-body,
+[data-theme="dark"] .card.output-card > .card-body {
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.45) 0%, rgba(30, 41, 59, 0.52) 100%);
+}
+
+.calculator-card .form-label {
+  color: #1e293b;
+  font-weight: 600;
+}
+
+[data-theme="dark"] .calculator-card .form-label {
+  color: #cbd5e1;
+}
+
+.calculator-card .form-control,
+.calculator-card .form-select,
+.calculator-card textarea,
+.calculator-card input[type="text"],
+.calculator-card input[type="number"],
+.calculator-card math-field {
+  border-radius: 11px;
+  border: 1px solid var(--field-border);
+  background: var(--field-bg);
+}
+
+.calculator-card .form-control:focus,
+.calculator-card .form-select:focus,
+.calculator-card textarea:focus,
+.calculator-card input[type="text"]:focus,
+.calculator-card input[type="number"]:focus,
+.calculator-card math-field:focus-within {
+  border-color: rgba(15, 118, 110, 0.55) !important;
+  box-shadow: 0 0 0 3px var(--panel-focus-ring) !important;
+}
+
+/* Standardize the "Show description" button across all modules */
+
+.calculator-card #toggleDescrizione {
+  border-radius: 999px !important;
+  border: 1px solid var(--toggle-border) !important;
+  background: var(--toggle-bg) !important;
+  color: var(--toggle-text) !important;
+  font-weight: 600;
+  letter-spacing: 0.15px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.2s ease;
+}
+
+.calculator-card #toggleDescrizione:hover {
+  background: var(--toggle-bg-hover) !important;
+  border-color: rgba(100, 116, 139, 0.7) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
+}
+
+.calculator-card #toggleDescrizione:focus,
+.calculator-card #toggleDescrizione:focus-visible {
+  box-shadow: 0 0 0 3px var(--panel-focus-ring) !important;
+  outline: none;
+}
+
+.calculator-card #toggleDescrizione .rotate-icon {
+  transition: transform 0.22s ease;
+}
+
+.calculator-card #toggleDescrizione[aria-expanded="true"] .rotate-icon {
+  transform: rotate(180deg);
+}
+
+.calculator-card .collapse[id^="descrizione"] > .card.card-body {
+  border-radius: 14px;
+  border: 1px solid var(--field-border) !important;
+  background: linear-gradient(170deg, rgba(255, 255, 255, 0.75) 0%, rgba(241, 245, 249, 0.75) 100%) !important;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+  color: var(--panel-muted);
+}
+
+[data-theme="dark"] .calculator-card .collapse[id^="descrizione"] > .card.card-body {
+  background: linear-gradient(170deg, rgba(30, 41, 59, 0.78) 0%, rgba(15, 23, 42, 0.78) 100%) !important;
+}
+
+.calculator-card .btn {
+  border-radius: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.calculator-card .btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
+}
+
+.calculator-card .btn.btn-primary {
+  background: linear-gradient(135deg, var(--panel-input-header-a) 0%, #0f766e 100%);
+  border-color: var(--panel-input-header-a);
+}
+
+.calculator-card .btn.btn-primary:hover {
+  filter: brightness(0.97);
+}
+
+.calculator-card .btn.btn-secondary {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: #cbd5e1;
+  color: #334155;
+}
+
+.calculator-card .btn.btn-secondary:hover {
+  border-color: #94a3b8;
+  color: #0f172a;
+}
+
+/* Disabilita globalmente il cursore "not-allowed" sui controlli disabilitati */
+.btn:disabled,
+.btn.disabled,
+.notebook-nav-btn:disabled {
+  cursor: default !important;
+}
+
+/* Keep caret visible for partial-edit MathLive fields */
+math-field[read-only]:not([read-only="partial"]),
+math-field[readonly]:not([readonly="partial"]) {
+  caret-color: transparent !important;
+  --caret-color: transparent !important;
+}
+
+.output-card .empty-state,
+.output-card .text-muted.py-5,
+.output-card .text-center.text-muted.py-5 {
+  background: var(--panel-surface-soft);
+  border: 1px dashed rgba(148, 163, 184, 0.6);
+  border-radius: 14px;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 2rem 1rem !important;
+}
+
+.output-card .alert {
+  border-radius: 12px;
+}
+
+.output-card .result-section {
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid var(--field-border);
+  border-radius: 12px;
+  padding: 0.95rem 1rem 0.35rem;
+  box-shadow: var(--panel-shadow);
+}
+
+[data-theme="dark"] .output-card .result-section {
+  background: rgba(15, 23, 42, 0.68);
+}
+
+@media (max-width: 767.98px) {
+  .card.calculator-card > .card-body,
+  .card.output-card > .card-body {
+    padding: 1rem 0.9rem;
+  }
+
+  .calculator-card .btn {
+    width: 100%;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+}

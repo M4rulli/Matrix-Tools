@@ -76,7 +76,7 @@ function renderHasseDiagramFromPayload(containerId, graphPayload) {
           --bs-body-color: ${document.documentElement.getAttribute('data-theme') === 'dark' ? 'white' : 'black'};
         `;
         const inner = document.createElement('div');
-        // Rileva se siamo su mobile
+        // Rileva if siamo su mobile
         const isMobile = window.matchMedia('(max-width: 768px)').matches;
         const scale = isMobile ? 0.3 : 0.5;
 
@@ -116,7 +116,7 @@ function renderHasseDiagramFromPayload(containerId, graphPayload) {
 
         wrapper.appendChild(inner);
 
-        // Inserisci nel container
+        // Insert into the container
         container.innerHTML = '';
         container.appendChild(wrapper);
 

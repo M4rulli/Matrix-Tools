@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="it" data-page-title="Linearizzazione Sistemi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Linearizzazione Sistemi - Matrix Tools</title>
+  <link rel="icon" href="/static/icons/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/svg+xml" href="/static/icons/favicon.svg" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/static/icons/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/static/icons/favicon-16x16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/static/icons/apple-touch-icon.png" />
+  <link rel="manifest" href="/static/icons/site.webmanifest" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/mathlive/dist/mathlive-static.css" />
+  <link href="/static/style.css" rel="stylesheet" />
+  <link href="/static/panels-theme.css" rel="stylesheet" />
+  
+</head>
+<body>
+  <div id="navbar"></div>
+
+  <div class="container-fluid" style="margin-top: 100px; padding: 0rem 1.5rem 0rem 0rem !important;">
+    <style>
+  .rotate-icon {
+    transition: transform 0.3s ease;
+  }
+  .step-title {
+    margin-top: 1em;
+  }
+  .centered-math {
+    text-align: center;
+  }
+</style>
+<div class="row">
+    <div class="col-12 mb-4">
+        <div class="card calculator-card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-edit me-2"></i>Input
+                </h5>
+            </div>
+            <div class="card-body">
+
+            <!-- Description button + collapsible section -->
+
+            <div class="mb-3">
+              <button id="toggleDescrizione"
+                      class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2"
+                      style="font-size: 0.875rem;"
+                      type="button"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#descrizioneLinearizzazione"
+                      aria-expanded="false"
+                      aria-controls="descrizioneLinearizzazione">
+                <i class="fas fa-chevron-down rotate-icon transition" id="descrizioneIcon"></i>
+                <span id="descrizioneText">Mostra descrizione</span>
+              </button>
+            </div>
+
+            <div class="collapse mb-3" id="descrizioneLinearizzazione">
+              <div class="card card-body bg-light border mt-2">
+                <p class="text-muted text-justify">
+                  In un sistema dinamico su \( \mathbb{T} = \mathbb{R} \) o \( \mathbb{T} = \mathbb{Z} \), la
+                  <strong>linearizzazione</strong> consente di descrivere il comportamento locale intorno a un punto di
+                  equilibrio tramite un sistema lineare. Consideriamo un sistema non lineare della forma:
+                </p>
+                <div class="text-center mb-3" id="systemFormula" style="font-size: 1.2rem;"></div>
+                <p class="text-muted text-justify small">
+                  La linearizzazione in \((\mathbf{x}_e, u_e)\) produce le derivate parziali di \(f\) e \(h\) rispetto
+                  a \(\mathbf{x}\) e \(u\), valutate nel punto. Essa comporta il calcolo delle matrici
+                  \(A = \nabla_{\mathbf{x}} f\), \(B = \nabla_{u} f\), \(C = \nabla_{\mathbf{x}} h\),
+                  \(D = \nabla_{u} h\), tutte valutate nel punto. Queste ultime descrivono la dinamica e l’uscita del
+                  sistema linearizzato.
+                </p>
+              </div>
+            </div>
+
+            <script>
+              const descrizioneCollapse = document.getElementById('descrizioneLinearizzazione');
+              const descrizioneText = document.getElementById('descrizioneText');
+              const descrizioneIcon = document.getElementById('descrizioneIcon');
+
+              descrizioneCollapse.addEventListener('hide.bs.collapse', () => {
+                descrizioneText.textContent = 'Mostra descrizione';
+                descrizioneIcon.classList.remove('fa-chevron-up');
+                descrizioneIcon.classList.add('fa-chevron-down');
+              });
+              descrizioneCollapse.addEventListener('show.bs.collapse', () => {
+                descrizioneText.textContent = 'Nascondi descrizione';
+                descrizioneIcon.classList.remove('fa-chevron-down');
+                descrizioneIcon.classList.add('fa-chevron-up');
+              });
+            </script>
+
+            <div class="mb-4">
+                <label class="form-label fw-semibold">Dominio:</label>
+                <select id="domainSelect" class="form-select form-select-sm w-auto d-inline-block">
+                    <option value="typeContinuo" selected>Continuo (T = ℝ)</option>
+                    <option value="typeDiscreto">Discreto (T = ℤ)</option>
+                </select>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label fw-semibold">Dimensione del sistema:</label>
+                <select id="rowSelector" class="form-select form-select-sm w-auto d-inline-block" onchange="updateMatrix();">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3" selected>3</option>
+                    <option value="4">4</option>
+                </select>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label fw-semibold">Inserisci \( f(x,u) \):</label>
+                <div style="text-align: center;">
+                  <math-field id="fxuField"
+                              virtual-keyboard-mode="off"
+                              delete-mode="off"
+                              default-mode="math"
+                              read-only="partial"
+                              class="math-input"
+                              style="font-size: 22px; display: inline-block; margin: 0 auto;">
+                  </math-field>
+                </div>
+            </div>
+            <div class="mb-4">
+                <label class="form-label fw-semibold">Inserisci \( h(x,u) \):</label>
+                <div style="text-align: center;">
+                  <math-field id="hxuField"
+                              virtual-keyboard-mode="off"
+                              delete-mode="off"
+                              default-mode="math"
+                              read-only="partial"
+                              class="math-input"
+                              style="font-size: 22px; display: inline-block; margin: 0 auto;">
+                  </math-field>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label fw-semibold">Inserisci la condizione di equilibrio \( u_e \):</label>
+                <div style="text-align: center;">
+                  <math-field id="equilibriumField"
+                              virtual-keyboard-mode="off"
+                              delete-mode="off"
+                              default-mode="math"
+                              read-only="partial"
+                              class="math-input"
+                              style="font-size: 22px; display: inline-block; margin: 0 auto;">
+                      u_e = \placeholder[UE0]{}
+                  </math-field>
+                </div>
+            </div>
+
+            <div class="form-text mb-3" style="font-size: 0.85rem;">
+                Le variabili disponibili sono \(x_1, x_2, x_3, x_4\), così come l'ingresso \(u\). Non è necessario specificare il tempo \(t\) nelle variabili.
+            </div>
+
+            <form id="equazioniForm" onsubmit="return false;">
+              <div style="text-align: center; margin-top: 20px;">
+                <button onclick="invioLinearizzazione()" class="btn btn-primary btn-sm px-3">
+                  <i class="fas fa-play me-2"></i>Linearizza
+                </button>
+                <button onclick="resetLinearizzazione()" class="btn btn-secondary btn-sm px-3 ms-2">
+                  <i class="fas fa-eraser me-2"></i>Pulisci
+                </button>
+              </div>
+            </form>
+            <div class="output mt-4"></div>
+
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-12">
+        <div class="card output-card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-line me-2"></i>Output
+                </h5>
+            </div>
+            <div class="card-body" id="output">
+                
+                        
+                    
+                
+                    <div class="empty-state text-center text-muted py-5">
+                        <i class="fas fa-microchip fa-3x mb-3 opacity-50"></i>
+                        <h6>Pronto per iniziare</h6>
+                        <p class="small">Inserisci le equazioni non lineari del tuo sistema per visualizzare la linearizzazione.</p>
+                    </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+function renderSystemFormula() {
+    const domain = document.getElementById("domainSelect").value;
+    const isDiscrete = domain === "typeDiscreto";
+    // Use a single vector variable for the state equation
+    const lhs = isDiscrete ? "x(t+1)" : "\\dot{x}(t)";
+    const rhs = "f(x(t), u(t))";
+    const latex = `
+        \\[
+        \\begin{cases}
+        ${lhs} = ${rhs} \\\\
+        y(t) = h(x(t), u(t))
+        \\end{cases}
+        \\]
+    `;
+    const div = document.getElementById("systemFormula");
+    div.innerHTML = latex;
+    if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise([div]);
+    }
+}
+document.getElementById("domainSelect").addEventListener("change", renderSystemFormula);
+function waitForMathJaxReady(callback, timeout = 5000) {
+  const start = performance.now();
+  (function check() {
+    if (window.MathJax?.startup?.promise) {
+      MathJax.startup.promise.then(callback);
+    } else if (performance.now() - start < timeout) {
+      setTimeout(check, 30);
+    }
+  })();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  waitForMathJaxReady(() => {
+    renderSystemFormula();
+    updateEquationInputs();
+    window.fxuField = document.getElementById("fxuField");
+    window.hxuField = document.getElementById("hxuField");
+    window.equilibriumField = document.getElementById("equilibriumField");
+  });
+});
+
+function updateMatrix() {
+  // (Mantieni per retrocompatibilità o altre parti del codice)
+}
+
+function updateEquationInputs() {
+  const numRows = parseInt(document.getElementById("rowSelector").value);
+  const fRows = Array.from({ length: numRows }, (_, i) => `\\placeholder[F${i}0]{}`);
+  const fMatrix = `\\begin{bmatrix} ${fRows.join(" \\\\ ")} \\end{bmatrix}`;
+  const hMatrix = `\\begin{bmatrix} \\placeholder[H00]{} \\end{bmatrix}`;
+
+  document.getElementById("fxuField").value = `f(x,u) = ${fMatrix}`;
+  document.getElementById("hxuField").value = `h(x,u) = ${hMatrix}`;
+}
+
+document.getElementById("rowSelector").addEventListener("change", () => {
+  updateMatrix();
+  updateEquationInputs();
+});
+
+function invioLinearizzazione() {
+  mostraSistemaInserito();
+  const out = document.getElementById('output');
+  out.innerHTML = '';
+  const button = document.querySelector('#equazioniForm button');
+  button.disabled = true;
+  const originalHTML = button.innerHTML;
+  button.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Linearizza`;
+
+  const size = parseInt(document.getElementById('rowSelector').value);
+  const eqs = [];
+  for (let i = 0; i < size; i++) {
+    const id = `F${i}0`;
+    const val = (fxuField.getPromptValue(id).trim().replace(/\\\\/g, '\\')) || '0';
+    eqs.push(val);
+  }
+
+  const h = (hxuField.getPromptValue("H00").trim().replace(/\\\\/g, '\\')) || "0";
+  const u_e = (equilibriumField.getPromptValue("UE0").trim().replace(/\\\\/g, '\\')) || "0";
+  const dominio = document.getElementById('domainSelect').value;
+
+  // Segnalo che l’utente ha richiesto lo scroll
+  window.__scrollAfterResult = true;
+
+  fetch('/api/linearization', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      equazioni: eqs,
+      equazioneUscita: h,
+      valoreIngresso: u_e,
+      dominio: dominio === 'typeDiscreto' ? 'typeDiscreto' : 'typeContinuo'
+    })
+  })
+  .then(r => r.json())
+  .then(res => {
+    if (res.success) {
+      showRisultato(res);
+      if (window.__scrollAfterResult) {
+        document.querySelector('.output-card').scrollIntoView({ behavior: 'smooth' });
+        window.__scrollAfterResult = false;  // Reset flag
+      }
+      button.disabled = false;
+      button.innerHTML = originalHTML;
+    } else {
+      const outputCardBody = document.querySelector('.output-card .card-body');
+      outputCardBody.innerHTML = createErrorAlert(res.errore);
+      if (window.__scrollAfterResult) {
+        document.querySelector('.output-card').scrollIntoView({ behavior: 'smooth' });
+        window.__scrollAfterResult = false;
+      }
+      button.disabled = false;
+      button.innerHTML = originalHTML;
+    }
+  })
+  .catch(err => {
+    const outputCardBody = document.querySelector('.output-card .card-body');
+    outputCardBody.innerHTML = createErrorAlert(err.message);
+    if (window.__scrollAfterResult) {
+      document.querySelector('.output-card').scrollIntoView({ behavior: 'smooth' });
+      window.__scrollAfterResult = false;
+    }
+    button.disabled = false;
+    button.innerHTML = originalHTML;
+  });
+}
+
+function mostraSistemaInserito() {
+  const dominio = document.getElementById('domainSelect').value;
+  const isDiscrete = dominio === 'typeDiscreto';
+
+  const size = parseInt(document.getElementById('rowSelector').value);
+  const eqs = [];
+  for (let i = 0; i < size; i++) {
+    const id = `F${i}0`;
+    let val = fxuField.getPromptValue(id).trim() || '0';
+    if (isDiscrete) {
+      eqs.push(`x_{${i + 1}}(t+1) &= ${val}`);
+    } else {
+      eqs.push(`\\dot{x}_{${i + 1}}(t) &= ${val}`);
+    }
+  }
+  const h = hxuField.getPromptValue("H00").trim() || "0";
+  const eqsLatex = eqs.map(e => e).join(' \\\\ ');
+  const hLatex = `y(t) &= ${h}`;
+  const sistema = `
+    <p class="step-title"><b>0)</b> Sistema inserito:</p>
+    <p class="centered-math">\\[
+      \\left\\{
+      \\begin{aligned}
+        ${eqsLatex} \\\\
+        ${hLatex}
+      \\end{aligned}
+      \\right.
+    \\]
+    </p>
+  `;
+  return sistema;
+}
+
+function showRisultato(res) {
+  const outputCardBody = document.querySelector('.output-card .card-body');
+  if (!res.success) {
+    outputCardBody.innerHTML = createErrorAlert(res.errore);
+    return;
+  }
+
+  /* 0) System inserito */
+  const sistemaHtml = mostraSistemaInserito();
+
+  /* Passi di analisi + raccolta LaTeX */
+  let stepsHtml = '';
+  let latexSteps = '';
+  if (Array.isArray(res.latex)) {
+    res.latex.forEach((step, idx) => {
+      const num = idx + 1;
+      stepsHtml += `
+        <p class="step-title"><b>${num})</b> ${step.title}</p>
+        <p class="centered-math">\\[${step.content}\\]</p>
+      `;
+      latexSteps += `${num}) ${step.title}\n\\[${step.content}\\]\n`;
+    });
+  }
+
+  /* Contenitore risultato */
+  const resultContainer = document.createElement('div');
+  resultContainer.classList.add('result-section');
+  resultContainer.innerHTML = sistemaHtml + stepsHtml;
+
+  /* Notebook button placeholder */
+  const saveDiv = document.createElement('div');
+  saveDiv.id = 'linearizzazioneNotebookButton';
+  saveDiv.classList.add('mt-3');
+  resultContainer.appendChild(saveDiv);
+
+  /* Render nel DOM */
+  outputCardBody.innerHTML = '';
+  outputCardBody.appendChild(resultContainer);
+
+  /* Notebook payload */
+  const notebookPayload = {
+    title: 'Linearizzazione Sistemi',
+    algorithm: 'Linearizzazione Sistemi',
+    input: 'Sistema non lineare',
+    htmlOutput: resultContainer.outerHTML,
+    outputLatex: latexSteps,
+    rawData: res
+  };
+
+
+  const outputDiv = document.getElementById('output');
+  if (outputDiv) {
+    outputDiv.dataset.latex = latexSteps;
+    /* Preserve compatibility with gli altri algoritmi:
+       il dataset.latex deve essere anche sul card-body che contiene il risultato */
+    outputCardBody.dataset.latex = latexSteps;
+  }
+  window.currentExercise = notebookPayload;
+
+  if (typeof window.injectSaveButton === 'function') {
+    window.injectSaveButton(saveDiv, notebookPayload);
+  }
+
+  MathJax.typesetPromise([outputCardBody]);
+}
+
+function resetLinearizzazione() {
+  updateEquationInputs();
+  equilibriumField.setValue("u_e = \\placeholder[UE0]{}");
+  const outputCardBody = document.querySelector('.output-card .card-body');
+  outputCardBody.innerHTML = `
+    <div class="empty-state text-center text-muted py-5">
+        <i class="fas fa-microchip fa-3x mb-3 opacity-50"></i>
+        <h6>Pronto per iniziare</h6>
+        <p class="small">Inserisci le equazioni non lineari del sistema.</p>
+    </div>
+  `;
+  MathJax.typesetPromise([outputCardBody]);
+}
+
+function createErrorAlert(message) {
+    return `
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>Errore:</strong> ${message}
+        </div>
+    `;
+}
+</script>
+
+<script src="/static/js/anti-autoscroll.js"></script>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/mathlive@0.92.0/dist/mathlive.min.js"></script>
+  <script src="/static/js/layout-state.js"></script>
+  <script src="/static/js/site-i18n.js"></script>
+  <script src="/static/js/math-render-cache.js"></script>
+  <script src="/frontend/js/component-loader.js"></script>
+</body>
+</html>

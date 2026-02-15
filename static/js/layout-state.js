@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-// Tema: gestione iniziale
+// Theme: initial handling
 
 (function immediateThemeApplication() {
     const savedTheme = localStorage.getItem("theme");
@@ -85,6 +85,14 @@ window.toggleTheme = function () {
 // Sidebar: layout iniziale
 
 (function () {
+    // Static frontend pages use a different sidebar system (component-loader).
+    // Skip legacy sidebar bootstrapping to prevent open->close flicker on refresh.
+    const hasLegacyWrapper = !!document.querySelector(".wrapper");
+    if (!hasLegacyWrapper) {
+        document.documentElement.classList.remove("sidebar-initial-expanded");
+        return;
+    }
+
     const sidebarExpanded = localStorage.getItem("sidebarExpanded") === "true";
 
     if (sidebarExpanded) {
@@ -112,7 +120,7 @@ window.toggleTheme = function () {
         }
     }
 
-    // Rimuove solo la classe temporanea per disattivare il blocco delle animazioni
+    // Remove only the temporary class to disable animation lock
     document.addEventListener("DOMContentLoaded", () => {
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
@@ -124,7 +132,7 @@ window.toggleTheme = function () {
     });
 })();
 
-// Funzioni per il Quaderno
+// Notebook functions
 
 function getNotebookExercises() {
     const exercises = localStorage.getItem("notebookExercises");

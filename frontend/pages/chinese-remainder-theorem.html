@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="it" data-page-title="Teorema Cinese del Resto">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Teorema Cinese del Resto - Matrix Tools</title>
+  <link rel="icon" href="/static/icons/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/svg+xml" href="/static/icons/favicon.svg" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/static/icons/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/static/icons/favicon-16x16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/static/icons/apple-touch-icon.png" />
+  <link rel="manifest" href="/static/icons/site.webmanifest" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/mathlive/dist/mathlive-static.css" />
+  <link href="/static/style.css" rel="stylesheet" />
+  <link href="/static/panels-theme.css" rel="stylesheet" />
+  
+</head>
+<body>
+  <div id="navbar"></div>
+
+  <div class="container-fluid" style="margin-top: 100px; padding: 0rem 1.5rem 0rem 0rem !important;">
+    <style>
+  .math-input       { font-size: 22px; display: inline-block; margin: 0 auto; }
+  .step-title       { margin-top: 1em; }
+  .centered-math    { text-align: center; }
+math-field#congruencesField {
+  display: block;
+  width: 100%;
+  min-height: 3em;
+  margin-bottom: 1em;
+  font-family: monospace;
+  font-size: 22px;
+}
+</style>
+
+<div class="row">
+  <!-- Input Card -->
+  <div class="col-12 mb-4">
+    <div class="card calculator-card shadow-sm">
+      <div class="card-header bg-primary text-white">
+        <h5 class="card-title mb-0">
+          <i class="fas fa-edit me-2"></i>Input
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="mb-3">
+          <button id="toggleDescrizione"
+                  class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#descrizioneCRT"
+                  aria-expanded="false"
+                  aria-controls="descrizioneCRT">
+            <i id="descrizioneIcon" class="fas fa-chevron-down rotate-icon"></i>
+            <span id="descrizioneText">Mostra descrizione</span>
+          </button>
+        </div>
+
+        <div id="descrizioneCRT" class="collapse mb-3">
+          <div class="card card-body mt-2">
+            <p class="text-muted mb-0">
+              Il <strong>Teorema Cinese del Resto</strong> stabilisce che, dati interi coprimi
+              \( n_1, \dots , n_k \) e qualunque sistema di congruenze detto in forma cinese:
+              \[
+                \begin{aligned}
+                  x &\equiv a_1 \pmod{n_1}\\
+                  &\;\;\vdots\\
+                  x &\equiv a_k \pmod{n_k},
+                \end{aligned}
+              \]
+              esiste un <em>unico</em> intero \( x \) modulo \( N = n_1\cdots n_k \)
+              che soddisfa simultaneamente tutte le congruenze.
+            </p>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="crtSizeSelect" class="form-label fw-semibold">Numero di congruenze:</label>
+          <select id="crtSizeSelect" class="form-select" aria-label="Seleziona numero congruenze">
+            <option value="2" selected>2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label for="congruencesField" class="form-label fw-semibold">Inserisci il sistema congruenziale:</label>
+          <math-field id="congruencesField"
+                      delete-mode="off"
+                      default-mode="math"
+                      read-only="partial"
+                      class="math-input"
+                      style="width:100%;">
+          </math-field>
+          <p class="form-text">
+            Inserisci i valori dei resti e dei moduli nei placeholder. Usa la tastiera o il mouse per modificare.
+          </p>
+        </div>
+
+        <div class="text-center mt-3">
+          <button id="crtButton" onclick="calcolaCRT()" class="btn btn-primary btn-sm px-3">
+            <span id="crtButtonIcon"><i class="fas fa-play me-2"></i></span>
+            Calcola Soluzione
+          </button>
+          <button onclick="resetCRT()" class="btn btn-secondary btn-sm px-3 ms-1">
+            <i class="fas fa-eraser me-2"></i>Pulisci
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Output Card -->
+  <div class="col-12">
+    <div class="card output-card shadow-sm">
+      <div class="card-header bg-success text-white">
+        <h5 class="card-title mb-0">
+          <i class="fas fa-chart-line me-2"></i>Output
+        </h5>
+      </div>
+      <div class="card-body" id="output">
+        <div class="empty-state text-center text-muted py-5">
+          <i class="fas fa-project-diagram fa-3x mb-3 opacity-50"></i>
+          <h6>Pronto</h6>
+          <p class="small">Inserisci le congruenze e premi “Calcola Soluzione”.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function buildTemplate(size) {
+  let lines = [];
+  for (let i = 1; i <= size; i++) {
+    lines.push(`\\placeholder[c${i}]{}\\;x \\equiv \\placeholder[a${i}]{}  \\mod \\placeholder[n${i}]{} `);
+  }
+  return `\\left\\{\\begin{aligned} ${lines.join('\\\\')} \\end{aligned}\\right.`;
+}
+
+function calcolaCRT() {
+  window.__scrollAfterResult = true;
+  const icon = document.getElementById("crtButtonIcon");
+  icon.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>`;
+
+  const output = document.getElementById("output");
+  const size = parseInt(document.getElementById("crtSizeSelect").value, 10);
+
+  const pairs = [];
+  for (let i = 1; i <= size; i++) {
+    const cVal = mf.getPromptValue("c" + i);
+    const aVal = mf.getPromptValue("a" + i);
+    const nVal = mf.getPromptValue("n" + i);
+    if (cVal === null || aVal === null || nVal === null || cVal.trim() === "" || aVal.trim() === "" || nVal.trim() === "" || isNaN(cVal) || isNaN(aVal) || isNaN(nVal)) {
+      output.innerHTML = createErrorAlert(`Inserisci valori validi per c${i}, a${i} e n${i}.`);
+      MathJax.typesetPromise([output]);
+      icon.innerHTML = `<i class="fas fa-play me-2"></i>`;
+      return;
+    }
+    pairs.push({ a: parseInt(cVal, 10), b: parseInt(aVal, 10), n: parseInt(nVal, 10) });
+  }
+
+  // Spinner in the output
+  output.innerHTML = `<div class="text-center my-3">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Calcolo…</span>
+    </div>
+  </div>`;
+
+  fetch('/api/chinese-remainder-theorem', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ equations: pairs })
+  })
+  .then(r => r.json())
+  .then(res => {
+    if (!res.success) {
+      output.innerHTML = createErrorAlert(res.error);
+      MathJax.typesetPromise([output]).then(scrollToOutput);
+    } else {
+      // Step 0 – input system
+      const systemLines = pairs
+        .map(({ a: _a, b: _b, n: _n }) =>
+          `${_a}\\,x \\equiv ${_b}\\pmod{${_n}}`)
+        .join(" \\\\ ");
+      const systemLatex = `\\begin{cases} ${systemLines} \\end{cases}`;
+      let latexSteps = `
+        <p class="step-title"><b>0)</b> Sistema inserito:</p>
+        <p class="centered-math">\\[ ${systemLatex} \\]</p>`;
+
+      if (Array.isArray(res.latex)) {
+        latexSteps += res.latex.map((step, idx) => `
+          <p class="step-title"><b>${idx + 1})</b> ${step.title}</p>
+          <p class="centered-math">\\[${step.content}\\]</p>
+        `).join('');
+      }
+
+      // Insert results and prepare notebook payload data
+      output.innerHTML = `<div class="result-section">${latexSteps}</div>`;
+      output.dataset.latex = latexSteps;
+
+      const payload = {
+        title: 'Teorema Cinese del Resto',
+        algorithm: 'Teorema Cinese del Resto',
+        input: systemLatex,
+        htmlOutput: output.innerHTML,   // HTML per GUI/PDF
+        output: latexSteps,             // compatibilità saveToNotebook
+        outputLatex: latexSteps,        // per esportazione .tex
+        rawData: res
+      };
+
+      window.currentExercise = payload;
+      injectSaveButton(
+        output.querySelector('.result-section'),
+        payload
+      );
+
+      MathJax.typesetPromise([output]).then(scrollToOutput);
+    }
+    icon.innerHTML = `<i class="fas fa-play me-2"></i>`;
+  })
+  .catch(err => {
+    output.innerHTML = createErrorAlert(err.message);
+    MathJax.typesetPromise([output]).then(scrollToOutput);
+    icon.innerHTML = `<i class="fas fa-play me-2"></i>`;
+  });
+}
+
+function resetCRT() {
+  const size = parseInt(document.getElementById("crtSizeSelect").value, 10);
+  mf.setValue(buildTemplate(size));
+  mf.focus();
+  const output = document.getElementById("output");
+  output.innerHTML = `
+    <div class="empty-state text-center text-muted py-5">
+      <i class="fas fa-project-diagram fa-3x mb-3 opacity-50"></i>
+      <h6>Pronto</h6>
+      <p class="small">Inserisci le congruenze e premi “Calcola Soluzione”.</p>
+    </div>`;
+}
+
+function createErrorAlert(msg) {
+  return `
+    <div class="alert alert-danger">
+      <i class="fas fa-exclamation-triangle me-2"></i>
+      <strong>Errore:</strong> ${msg}
+    </div>`;
+}
+
+function scrollToOutput() {
+  if (window.__scrollAfterResult) {
+    document.querySelector('.output-card').scrollIntoView({ behavior: 'smooth' });
+    window.__scrollAfterResult = false;
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  // Make all coefficient, remainder, and modulus placeholders editable
+  window.mf = document.getElementById("congruencesField");
+  window.mf.prompts = {};
+  for (let i = 1; i <= 4; i++) {
+    window.mf.prompts["a" + i] = "";
+    window.mf.prompts["n" + i] = "";
+    window.mf.prompts["c" + i] = "";
+  }
+  const sizeSelect = document.getElementById("crtSizeSelect");
+
+  function updateTemplate() {
+    const size = parseInt(sizeSelect.value, 10);
+    mf.setValue(buildTemplate(size));
+    mf.focus();
+  }
+
+  sizeSelect.addEventListener("change", () => {
+    updateTemplate();
+  });
+
+  const descrCollapse = document.getElementById("descrizioneCRT");
+  const descrText = document.getElementById("descrizioneText");
+  const descrIcon = document.getElementById("descrizioneIcon");
+  descrCollapse.addEventListener("hide.bs.collapse", () => {
+    descrText.textContent = "Mostra descrizione";
+    descrIcon.classList.remove("fa-chevron-up");
+    descrIcon.classList.add("fa-chevron-down");
+  });
+  descrCollapse.addEventListener("show.bs.collapse", () => {
+    descrText.textContent = "Nascondi descrizione";
+    descrIcon.classList.remove("fa-chevron-down");
+    descrIcon.classList.add("fa-chevron-up");
+  });
+
+  updateTemplate();
+});
+</script>
+
+<script src="/static/js/anti-autoscroll.js"></script>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/mathlive@0.92.0/dist/mathlive.min.js"></script>
+  <script src="/static/js/layout-state.js"></script>
+  <script src="/static/js/site-i18n.js"></script>
+  <script src="/static/js/math-render-cache.js"></script>
+  <script src="/frontend/js/component-loader.js"></script>
+</body>
+</html>

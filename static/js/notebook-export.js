@@ -8,7 +8,7 @@ window.addEventListener('load', function() {
 
 // Export notebook as LaTeX (.tex) file
 function exportNotebookAsLatex() {
-    // Fallback se getNotebook non è disponibile
+    // Fallback if getNotebook is unavailable
     let notebook;
     if (typeof getNotebook === 'function') {
         notebook = getNotebook();
@@ -59,7 +59,7 @@ function exportNotebookAsLatex() {
     const sortedNotebook = notebook.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 
     sortedNotebook.forEach((exercise, index) => {
-        // Usa la stringa TeX salvata come outputLatex se disponibile
+        // Use the saved TeX string as outputLatex when available
         const latexOut = exercise.outputLatex;
 
         // Clean and wrap TikZ in figure floats
@@ -85,7 +85,7 @@ ${cleaned}
 
 // Export notebook as PDF (using browser print)
 function exportNotebookAsPdf() {
-    // Fallback se getNotebook non è disponibile
+    // Fallback if getNotebook is unavailable
     let notebook;
     if (typeof getNotebook === 'function') {
         notebook = getNotebook();
@@ -233,7 +233,7 @@ function exportNotebookAsPdf() {
 
 // Export notebook as JSON file
 function exportNotebookAsJson() {
-    // Fallback se getNotebook non è disponibile
+    // Fallback if getNotebook is unavailable
     let notebook;
     if (typeof getNotebook === 'function') {
         notebook = getNotebook();

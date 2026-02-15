@@ -112,6 +112,8 @@ body {
     z-index: 1000;
     transform: translateX(-100%);
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
     backdrop-filter: blur(10px);
     border-right: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -319,8 +321,10 @@ html.disable-transitions *::after {
 }
 
 .sidebar-content {
-    padding: 1rem 0;
-    height: calc(100vh - 200px);
+    padding: 0.75rem 0 1rem;
+    flex: 1 1 auto;
+    min-height: 0;
+    height: auto;
     overflow-y: auto;
     overflow-x: hidden;
 }
@@ -358,14 +362,14 @@ html.disable-transitions *::after {
     align-items: center;
     justify-content: space-between;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transition: background-color 0.2s ease, transform 0.2s ease;
     border-radius: 12px;
     margin: 0.25rem 0.25rem 0.25rem -1rem;
 }
 
 .category-header:hover {
     background: rgba(255, 255, 255, 0.1);
-    transform: translateX(4px);
+    transform: translateX(2px);
 }
 
 /* Sposta il testo dei titoli più a destra */
@@ -380,7 +384,7 @@ html.disable-transitions *::after {
     margin-left: 2rem; /* Allinea il testo a destra rispetto alle icone */
 }
 
-/* Se sidebar espansa, sposta solo in quel caso */
+/* If sidebar espansa, sposta only in quel caso */
 .wrapper.sidebar-expanded .category-title {
     margin-left: 2rem;
 }
@@ -398,7 +402,7 @@ html.disable-transitions *::after {
 .chevron-icon {
     font-size: 0.8rem;
     color: rgba(255, 255, 255, 0.6);
-    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transition: transform 0.2s ease, color 0.2s ease;
 }
 
 .category-header.expanded .chevron-icon {
@@ -407,9 +411,9 @@ html.disable-transitions *::after {
 }
 
 .algorithm-container {
-    max-height: 500px !important;
+    max-height: 360px !important;
     overflow: hidden;
-    transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transition: max-height 0.2s ease, background-color 0.2s ease;
     margin: 0 1rem;
     border-radius: 8px;
     background: rgba(255, 255, 255, 0.05);
@@ -419,6 +423,7 @@ html.disable-transitions *::after {
 .algorithm-container.collapsed {
     max-height: 0 !important;
     margin: 0 1rem;
+    padding: 0;
     background: transparent;
 }
 
@@ -429,7 +434,7 @@ html.disable-transitions *::after {
 }
 
 .algorithm-list li {
-    margin: 0.25rem 0;
+    margin: 0;
 }
 
 .algorithm-link {
@@ -439,7 +444,7 @@ html.disable-transitions *::after {
     margin: 0.25rem 0.75rem;
     color: #ecf0f1;
     text-decoration: none;
-    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
     border-radius: 12px;
     border: 1px solid transparent;
     position: relative;
@@ -575,16 +580,16 @@ html.sidebar-initial-expanded .wrapper .navbar {
     flex: 1;
     display: flex;
     flex-direction: column;
-    transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 /* Card spacing for vertical layout */
 .row>[class*="col-"] {
     margin-bottom: 1rem;
-    transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transition: none;
 }
 
-/* Smooth transitions for all layout elements */
+/* Avoid expensive global transitions that cause lag on collapse/expand */
 .container-fluid,
 .row,
 .col,
@@ -598,7 +603,12 @@ h6,
 p,
 div,
 span {
-    transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transition: none;
+}
+
+.collapse,
+.collapsing {
+    transition: height 0.2s ease !important;
 }
 
 .calculator-card {
@@ -615,6 +625,10 @@ span {
 
 .output-card {
     min-height: 400px;
+}
+
+.output-card .card-body {
+    padding-bottom: 4rem;
 }
 
 /* Text and Layout Improvements */
@@ -2070,7 +2084,7 @@ body {
 
 /* === NOTEBOOK SYSTEM STYLES === */
 
-/* Bottone Quaderno nella Sidebar - Stile premium originale */
+/* Bottone Notebook nella Sidebar - Stile premium originale */
 .notebook-button {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border: 2px solid rgba(255, 255, 255, 0.2);
@@ -2178,7 +2192,7 @@ body {
     border-color: rgba(255, 255, 255, 0.05);
 }
 
-/* Bottone Salva nel Quaderno - Posizione bottom-right molto visibile */
+/* Bottone Salva nel Notebook - Posizione bottom-right molto visibile */
 .save-to-notebook-btn {
     background: linear-gradient(135deg, #10b981, #059669);
     border: 2px solid rgba(16, 185, 129, 0.4);
@@ -2249,7 +2263,7 @@ body {
     min-height: 200px;
 }
 
-/* Modal del Quaderno - Design Premium */
+/* Modal del Notebook - Design Premium */
 .notebook-modal .modal-dialog {
     max-width: 95vw;
     width: 95vw;
@@ -2353,7 +2367,7 @@ body {
     flex-direction: column;
 }
 
-/* Layout verticale del quaderno */
+/* Layout verticale del notebook */
 .notebook-container {
     display: flex;
     flex-direction: column;
@@ -2520,7 +2534,7 @@ body {
     font-weight: 600;
 }
 
-/* Azioni del quaderno */
+/* Azioni del notebook */
 .notebook-actions {
     display: flex;
     gap: 0.75rem;
@@ -2565,7 +2579,7 @@ body {
     border-radius: 0 0 8px 8px;
 }
 
-/* Stato vuoto */
+/* State vuoto */
 .empty-notebook {
     display: flex;
     flex-direction: column;
@@ -2925,13 +2939,19 @@ body {
     }
 }
 
-@media (max-width: 767px) {
-    #sidebar {
-        display: none !important;
-    }
-    #sidebarCollapse {
-        display: none !important;
-    }
+#sidebarOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.45);
+    z-index: 990;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+#sidebarOverlay.visible {
+    opacity: 1;
+    visibility: visible;
 }
 
 
@@ -2951,7 +2971,8 @@ body {
   }
 }
 
-/* Dark theme: usa una tonalità coerente dalla palette dark */
+/* Dark theme: use a tone consistent with the dark palette */
+
 [data-theme="dark"] .help-modal-body {
   background-color: var(--bg-secondary);
   color: var(--text-primary);
@@ -2976,7 +2997,7 @@ body {
   color: var(--text-primary);
 }
 
-/* Dark theme: header del Help Modal con tonalità intermedia */
+/* Dark theme: header del Help Modal with tonalità intermedia */
 [data-theme="dark"] .help-modal .modal-header {
   background-color: var(--bg-secondary);
   color: var(--text-primary);
@@ -3008,10 +3029,15 @@ body {
 @media (min-width: 769px) {
   .navbar .navbar-brand {
     position: absolute;
-    left: clamp(8%, 20%, 30%) !important;
+    left: 4.8rem !important;
     top: 50%;
-    transform: translate(-50%, -50%);
+    transform: translateY(-50%);
     z-index: 1;
+    margin: 0 !important;
+    max-width: calc(100% - 23rem);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 
@@ -3060,3 +3086,241 @@ body {
   padding-bottom: 1.40rem; /* spazio extra per bottone */
 }
 
+/* Topbar controls: keep all right-side controls aligned and non-overlapping */
+.topbar-controls {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-left: auto;
+    position: relative;
+    z-index: 4;
+}
+
+.topbar-controls .theme-switch-container,
+.topbar-controls .btn-outline-info,
+.topbar-controls #languageToggleBtn {
+    position: static !important;
+    top: auto !important;
+    right: auto !important;
+    left: auto !important;
+    transform: none !important;
+    margin: 0 !important;
+}
+
+.language-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 38px;
+    min-width: 44px;
+    padding: 0.3rem 0.5rem;
+    border-radius: 10px !important;
+    border-width: 1.4px !important;
+}
+
+.flag-icon {
+    width: 24px;
+    height: 16px;
+    object-fit: cover;
+    border-radius: 3px;
+    box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.12);
+}
+
+.help-icon-btn {
+    min-width: 44px;
+    min-height: 38px;
+    padding: 0.3rem 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px !important;
+    border-width: 1.4px !important;
+}
+
+.help-btn-question {
+    font-weight: 700;
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.server-status-badge {
+    min-width: 30px;
+    min-height: 30px;
+    padding: 0.2rem;
+    border-radius: 999px !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    position: relative;
+}
+
+.server-status-badge::after {
+    content: attr(data-status-label);
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(15, 23, 42, 0.92);
+    color: #f8fafc;
+    font-size: 0.74rem;
+    padding: 0.22rem 0.45rem;
+    border-radius: 6px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+    z-index: 10;
+}
+
+.server-status-badge:hover::after {
+    opacity: 1;
+}
+
+.server-status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.server-status-badge.status-online .server-status-dot {
+    background: #22c55e;
+}
+
+.server-status-badge.status-booting .server-status-dot {
+    background: #f59e0b;
+}
+
+.server-status-badge.status-offline .server-status-dot {
+    background: #ef4444;
+}
+
+.api-disabled {
+    opacity: 0.6 !important;
+    pointer-events: none !important;
+}
+
+.site-footer {
+    margin-top: 2rem;
+    border-top: 1px solid rgba(148, 163, 184, 0.35);
+    background: rgba(255, 255, 255, 0.52);
+}
+
+.site-footer-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0.8rem 1rem;
+    color: #475569;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.footer-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.footer-inline a {
+    color: #0f766e;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.footer-inline a:hover {
+    text-decoration: underline;
+}
+
+[data-theme="dark"] .site-footer {
+    border-top-color: rgba(71, 85, 105, 0.65);
+    background: rgba(15, 23, 42, 0.58);
+}
+
+[data-theme="dark"] .site-footer-inner {
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .footer-inline a {
+    color: #67e8f9;
+}
+
+/* Mobile: avoid content squeeze when desktop sidebar persisted as expanded */
+@media (max-width: 767.98px) {
+    .wrapper.sidebar-expanded .content,
+    html.sidebar-initial-expanded .wrapper .content {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+
+    .wrapper.sidebar-expanded .navbar,
+    html.sidebar-initial-expanded .wrapper .navbar {
+        left: 0 !important;
+        width: 100% !important;
+    }
+
+    .navbar .container-fluid {
+        gap: 0.45rem;
+        padding-right: 0.5rem;
+        padding-left: 0.5rem;
+        align-items: center;
+        flex-wrap: nowrap;
+    }
+
+    .topbar-controls {
+        gap: 0.35rem;
+        margin-left: 0.2rem;
+        flex: 0 0 auto;
+    }
+
+    .language-toggle-btn {
+        min-width: 42px;
+        padding: 0.28rem 0.4rem;
+    }
+
+    .navbar {
+        height: auto !important;
+        min-height: 64px !important;
+        padding: 0.55rem 0.45rem !important;
+    }
+
+    .navbar #sidebarCollapse {
+        position: static !important;
+        top: auto !important;
+        left: auto !important;
+        transform: none !important;
+        margin: 0 0.3rem 0 0 !important;
+        flex: 0 0 auto;
+    }
+
+    .navbar .navbar-brand {
+        position: static !important;
+        left: auto !important;
+        top: auto !important;
+        transform: none !important;
+        margin: 0 !important;
+        flex: 1 1 auto;
+        min-width: 0;
+        max-width: 48vw;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: clamp(1.05rem, 4.8vw, 1.35rem);
+        line-height: 1.15;
+    }
+
+    .topbar-controls .btn-outline-info {
+        padding: 0.38rem 0.52rem;
+        min-width: 42px;
+    }
+
+    .help-icon-btn {
+        min-width: 42px;
+        min-height: 36px;
+        padding: 0.28rem 0.4rem;
+    }
+}

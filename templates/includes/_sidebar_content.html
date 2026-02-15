@@ -1,7 +1,7 @@
 <div class="sidebar-header">
     <h4 class="mb-0 d-flex align-items-center">
         <i class="fas fa-calculator me-1"></i>
-        <a href="{{ url_for('index') }}" class="text-reset text-decoration-none">Matrix Tools</a>
+        <a href="{{ lang_url('') }}" class="text-reset text-decoration-none">Matrix Tools</a>
     </h4>
 </div>
 
@@ -18,7 +18,8 @@
 </div>
 
 <div class="sidebar-content">
-    <!-- Sidebar: Sezione Quaderno -->
+    <!-- Sidebar: Notebook section -->
+
     <div class="notebook-section">
         <button
             class="notebook-button"
@@ -49,35 +50,43 @@
         <div class="algorithm-container collapsed" id="controls{{ sidebar_id_suffix }}">
             <ul class="algorithm-list">
                 <li>
-                    <a href="linearizzazione.html"
-                       class="algorithm-link {% if request.path.endswith('linearizzazione.html') %}active{% endif %}"
+                    <a href="linearization.html"
+                       class="algorithm-link {% if request.path.endswith('linearization.html') %}active{% endif %}"
                        onclick="clearSearch('{{ sidebar_id_suffix }}', event)">
                         <i class="fas fa-project-diagram me-2"></i>
                         <span>Linearizzazione</span>
                     </a>
                 </li>
                 <li>
-                    <a href="decomposizione-spettrale.html"
-                       class="algorithm-link {% if request.path.endswith('decomposizione-spettrale.html') %}active{% endif %}"
+                    <a href="spectral-decomposition.html"
+                       class="algorithm-link {% if request.path.endswith('spectral-decomposition.html') %}active{% endif %}"
                        onclick="clearSearch('{{ sidebar_id_suffix }}', event)">
                         <i class="fas fa-braille me-2"></i>
                         <span>Decomposizione Spettrale</span>
                     </a>
                 </li>
                 <li>
-                    <a href="equazioni-differenziali.html"
-                       class="algorithm-link {% if request.path.endswith('equazioni-differenziali.html') %}active{% endif %}"
+                    <a href="differential-equations.html"
+                       class="algorithm-link {% if request.path.endswith('differential-equations.html') %}active{% endif %}"
                        onclick="clearSearch('{{ sidebar_id_suffix }}', event)">
                         <i class="fas fa-wave-square me-2"></i>
                         <span>Equazioni Differenziali</span>
                     </a>
                 </li>
                 <li>
-                    <a href="equazioni-differenze.html"
-                       class="algorithm-link {% if request.path.endswith('equazioni-differenze.html') %}active{% endif %}"
+                    <a href="difference-equations.html"
+                       class="algorithm-link {% if request.path.endswith('difference-equations.html') %}active{% endif %}"
                        onclick="clearSearch('{{ sidebar_id_suffix }}', event)">
                         <i class="fas fa-step-forward me-2"></i>
                         <span>Equazioni alle Differenze</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="dynamical-systems.html"
+                       class="algorithm-link {% if request.path.endswith('dynamical-systems.html') %}active{% endif %}"
+                       onclick="clearSearch('{{ sidebar_id_suffix }}', event)">
+                        <i class="fas fa-sliders-h me-2"></i>
+                        <span>Sistemi Dinamici</span>
                     </a>
                 </li>
             </ul>
@@ -95,40 +104,40 @@
         <div class="algorithm-container collapsed" id="algebra{{ sidebar_id_suffix }}">
             <ul class="algorithm-list">
                 <li>
-                    <a href="potenze-modulari.html"
-                       class="algorithm-link {% if request.path.endswith('potenze-modulari.html') %}active{% endif %}"
+                    <a href="modular-powers.html"
+                       class="algorithm-link {% if request.path.endswith('modular-powers.html') %}active{% endif %}"
                        onclick="clearSearch('{{ sidebar_id_suffix }}', event)">
                         <i class="fas fa-divide me-2"></i>
                         <span>Potenze Modulari</span>
                     </a>
                 </li>
                 <li>
-                    <a href="diagramma-hasse.html"
-                       class="algorithm-link {% if request.path.endswith('diagramma-hasse.html') %}active{% endif %}"
+                    <a href="hasse-diagram.html"
+                       class="algorithm-link {% if request.path.endswith('hasse-diagram.html') %}active{% endif %}"
                        onclick="clearSearch('{{ sidebar_id_suffix }}', event)">
                         <i class="fas fa-cubes me-2"></i>
                         <span>Diagramma di Hasse</span>
                     </a>
                 </li>
                 <li>
-                    <a href="polinomi-booleani.html"
-                       class="algorithm-link {% if request.path.endswith('polinomi-booleani.html') %}active{% endif %}"
+                    <a href="boolean-polynomials.html"
+                       class="algorithm-link {% if request.path.endswith('boolean-polynomials.html') %}active{% endif %}"
                        onclick="clearSearch('{{ sidebar_id_suffix }}', event)">
                         <i class="fas fa-project-diagram me-2"></i>
                         <span>Polinomi Booleani</span>
                     </a>
                 </li>
                 <li>
-                    <a href="teorema-cinese-resto.html"
-                       class="algorithm-link {% if request.path.endswith('teorema-cinese-resto.html') %}active{% endif %}"
+                    <a href="chinese-remainder-theorem.html"
+                       class="algorithm-link {% if request.path.endswith('chinese-remainder-theorem.html') %}active{% endif %}"
                        onclick="clearSearch('{{ sidebar_id_suffix }}', event)">
                         <i class="fas fa-chess-board me-2"></i>
                         <span>Teorema Cinese del Resto</span>
                     </a>
                 </li>
                 <li>
-                    <a href="identita-bezout.html"
-                       class="algorithm-link {% if request.path.endswith('identita-bezout.html') %}active{% endif %}"
+                    <a href="bezout-identity.html"
+                       class="algorithm-link {% if request.path.endswith('bezout-identity.html') %}active{% endif %}"
                        onclick="clearSearch('{{ sidebar_id_suffix }}', event)">
                         <i class="fas fa-equals me-2"></i>
                         <span>Identità di Bézout</span>
@@ -148,24 +157,24 @@
         <div class="algorithm-container collapsed" id="linearalgebra{{ sidebar_id_suffix }}">
             <ul class="algorithm-list">
                 <li>
-                    <a href="determinante-laplace.html"
-                       class="algorithm-link {% if request.path.endswith('determinante-laplace.html') %}active{% endif %}"
+                    <a href="laplace-determinant.html"
+                       class="algorithm-link {% if request.path.endswith('laplace-determinant.html') %}active{% endif %}"
                        onclick="clearSearch('{{ sidebar_id_suffix }}', event)">
                         <i class="fas fa-dice-four me-2"></i>
                         <span>Determinante con Laplace</span>
                     </a>
                 </li>
                 <li>
-                    <a href="autovalori-autovettori.html"
-                       class="algorithm-link {% if request.path.endswith('autovalori-autovettori.html') %}active{% endif %}"
+                    <a href="eigenvalues-eigenvectors.html"
+                       class="algorithm-link {% if request.path.endswith('eigenvalues-eigenvectors.html') %}active{% endif %}"
                        onclick="clearSearch('{{ sidebar_id_suffix }}', event)">
                         <i class="fas fa-cubes me-2"></i>
                         <span>Autovalori e Autovettori</span>
                     </a>
                 </li>
                 <li>
-                    <a href="sistemi-lineari.html"
-                       class="algorithm-link {% if request.path.endswith('sistemi-lineari.html') %}active{% endif %}"
+                    <a href="linear-systems.html"
+                       class="algorithm-link {% if request.path.endswith('linear-systems.html') %}active{% endif %}"
                        onclick="clearSearch('{{ sidebar_id_suffix }}', event)">
                         <i class="fas fa-equals me-2"></i>
                         <span>Sistemi Lineari</span>
@@ -185,16 +194,16 @@
         <div class="algorithm-container collapsed" id="ricercaoperativa{{ sidebar_id_suffix }}">
             <ul class="algorithm-list">
                 <li>
-                    <a href="simplesso.html"
-                       class="algorithm-link {% if request.path.endswith('simplesso.html') %}active{% endif %}"
+                    <a href="simplex.html"
+                       class="algorithm-link {% if request.path.endswith('simplex.html') %}active{% endif %}"
                        onclick="clearSearch('{{ sidebar_id_suffix }}', event)">
                         <i class="fas fa-table me-2"></i>
                         <span>Metodo del Simplesso</span>
                     </a>
                 </li>
                 <li>
-                    <a href="condizioni-complementari.html"
-                       class="algorithm-link {% if request.path.endswith('condizioni-complementari.html') %}active{% endif %}"
+                    <a href="complementary-conditions.html"
+                       class="algorithm-link {% if request.path.endswith('complementary-conditions.html') %}active{% endif %}"
                        onclick="clearSearch('{{ sidebar_id_suffix }}', event)">
                         <i class="fas fa-handshake me-2"></i>
                         <span>Condizioni di Complementarità</span>
@@ -206,7 +215,7 @@
     <div class="category-section">
         <button class="category-header" onclick="toggleSection('analisi{{ sidebar_id_suffix }}', event)">
             <div class="category-title">
-                <i class="fas fa-chart-line category-icon"></i>
+                <i class="fas fa-chart-area category-icon"></i>
                 <span>Analisi Matematica</span>
             </div>
             <i class="fas fa-chevron-down chevron-icon"></i>
@@ -214,8 +223,8 @@
         <div class="algorithm-container collapsed" id="analisi{{ sidebar_id_suffix }}">
             <ul class="algorithm-list">
                 <li>
-                    <a href="studio-funzione.html"
-                       class="algorithm-link {% if request.path.endswith('studio-funzione.html') %}active{% endif %}"
+                    <a href="function-study.html"
+                       class="algorithm-link {% if request.path.endswith('function-study.html') %}active{% endif %}"
                        onclick="clearSearch('{{ sidebar_id_suffix }}', event)">
                         <i class="fas fa-wave-square me-2"></i>
                         <span>Studio di Funzione</span>

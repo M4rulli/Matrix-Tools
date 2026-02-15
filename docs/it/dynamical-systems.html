@@ -556,7 +556,7 @@ async function computeY() {
   const icon = document.getElementById('computeYIcon');
   const btn = document.getElementById('computeYBtn');
   const { domain, payload, inputLatex } = collectSystemPayload();
-  const endpoint = domain === 'R' ? '/api/forced-output' : '/api/forced-output-z';
+  const endpoint = domain === 'R' ? (window.API_BASE || '') + '/api/forced-output' : (window.API_BASE || '') + '/api/forced-output-z';
 
   icon.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>';
   btn.disabled = true;
@@ -591,7 +591,7 @@ async function computeX() {
   btn.disabled = true;
 
   try {
-    const res = await callEndpoint('/api/forced-state', payload);
+    const res = await callEndpoint((window.API_BASE || '') + '/api/forced-state', payload);
     renderResult('Sistema inserito:', inputLatex, res, 'Sistemi Dinamici - Stato');
   } catch (err) {
     output.innerHTML = createErrorAlert(err.message);
@@ -656,6 +656,7 @@ document.addEventListener('DOMContentLoaded', () => {
   <script src="../js/layout-state.js"></script>
   <script src="../js/site-i18n.js"></script>
   <script src="../js/math-render-cache.js"></script>
+  <script src="../js/config.js"></script>
   <script src="../js/component-loader.js"></script>
 </body>
 </html>

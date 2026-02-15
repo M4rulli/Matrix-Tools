@@ -228,7 +228,7 @@ function computeEigen() {
   output.innerHTML = '<div class="text-center my-3"><div class="spinner-border text-primary"></div></div>';
   output.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-  fetch('/api/eigenvalues-eigenvectors', {
+  fetch((window.API_BASE || '') + '/api/eigenvalues-eigenvectors', {
     method: 'POST',
     headers: {'Content-Type':'application/json'},
     body: JSON.stringify({ n, matrix })
@@ -296,6 +296,7 @@ function computeEigen() {
   <script src="../js/layout-state.js"></script>
   <script src="../js/site-i18n.js"></script>
   <script src="../js/math-render-cache.js"></script>
+  <script src="../js/config.js"></script>
   <script src="../js/component-loader.js"></script>
 </body>
 </html>

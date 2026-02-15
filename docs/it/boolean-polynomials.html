@@ -138,7 +138,7 @@ function analizzaPolinomio() {
       <span class="visually-hidden">Calcolo...</span>
     </div>
   </div>`;
-  fetch('/api/boolean-polynomials', {
+  fetch((window.API_BASE || '') + '/api/boolean-polynomials', {
     method: 'POST',
     headers: {'Content-Type':'application/json'},
     body: JSON.stringify({ polinomio: expr, n_vars: nVars })
@@ -262,6 +262,7 @@ function scrollToOutput() {
   <script src="../js/layout-state.js"></script>
   <script src="../js/site-i18n.js"></script>
   <script src="../js/math-render-cache.js"></script>
+  <script src="../js/config.js"></script>
   <script src="../js/component-loader.js"></script>
 </body>
 </html>

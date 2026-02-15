@@ -224,7 +224,7 @@ function computeSystem() {
   output.innerHTML = '<div class="text-center my-3"><div class="spinner-border text-primary"></div></div>';
   output.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-  fetch('/api/linear-systems', {
+  fetch((window.API_BASE || '') + '/api/linear-systems', {
     method: 'POST',
     headers: {'Content-Type':'application/json'},
     body: JSON.stringify({ n, equations })
@@ -292,6 +292,7 @@ function computeSystem() {
   <script src="../js/layout-state.js"></script>
   <script src="../js/site-i18n.js"></script>
   <script src="../js/math-render-cache.js"></script>
+  <script src="../js/config.js"></script>
   <script src="../js/component-loader.js"></script>
 </body>
 </html>

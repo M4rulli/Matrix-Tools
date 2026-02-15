@@ -187,7 +187,7 @@
             <span class="visually-hidden">Calcolo...</span>
         </div>
     </div>`;
-        fetch("/api/modular-powers", {
+        fetch((window.API_BASE || '') + "/api/modular-powers", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ base: +aClean, exponent: +bClean, modulo: +nClean }),
@@ -359,6 +359,7 @@
   <script src="../js/layout-state.js"></script>
   <script src="../js/site-i18n.js"></script>
   <script src="../js/math-render-cache.js"></script>
+  <script src="../js/config.js"></script>
   <script src="../js/component-loader.js"></script>
 </body>
 </html>

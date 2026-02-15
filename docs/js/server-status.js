@@ -7,7 +7,7 @@
   let retryTimer = null;
 
   function resolveApiBase() {
-    const explicit = window.MATRIX_API_BASE_URL || document.documentElement.getAttribute("data-api-base");
+    const explicit = window.API_BASE || window.MATRIX_API_BASE_URL || document.documentElement.getAttribute("data-api-base");
     if (explicit && explicit.trim()) return explicit.replace(/\/$/, "");
     return window.location.origin;
   }

@@ -140,7 +140,7 @@ function calcolaIntegrale () {
       '</div>' +
     '</div>';
 
-  fetch('/api/integral', {
+  fetch((window.API_BASE || '') + '/api/integral', {
     method : 'POST',
     headers: { 'Content-Type': 'application/json' },
     body   : JSON.stringify({ integrand })
@@ -243,6 +243,7 @@ function scrollToOutput () {
   <script src="../js/layout-state.js"></script>
   <script src="../js/site-i18n.js"></script>
   <script src="../js/math-render-cache.js"></script>
+  <script src="../js/config.js"></script>
   <script src="../js/component-loader.js"></script>
 </body>
 </html>

@@ -170,7 +170,7 @@ function calcolaCRT() {
     </div>
   </div>`;
 
-  fetch('/api/chinese-remainder-theorem', {
+  fetch((window.API_BASE || '') + '/api/chinese-remainder-theorem', {
     method: 'POST',
     headers: {'Content-Type':'application/json'},
     body: JSON.stringify({ equations: pairs })
@@ -304,6 +304,7 @@ document.addEventListener("DOMContentLoaded", () => {
   <script src="../js/layout-state.js"></script>
   <script src="../js/site-i18n.js"></script>
   <script src="../js/math-render-cache.js"></script>
+  <script src="../js/config.js"></script>
   <script src="../js/component-loader.js"></script>
 </body>
 </html>

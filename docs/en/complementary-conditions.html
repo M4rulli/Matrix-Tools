@@ -295,7 +295,7 @@ function computeCC(){
   const btn = document.getElementById('solveButton');
   const originalHTML = btn.innerHTML; btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Analisi...';
   output.innerHTML = '<div class="text-center my-3"><div class="spinner-border text-primary"></div></div>';
-  fetch('/api/complementary-conditions', {
+  fetch((window.API_BASE || '') + '/api/complementary-conditions', {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       tipo,
@@ -346,6 +346,7 @@ function computeCC(){
   <script src="../js/layout-state.js"></script>
   <script src="../js/site-i18n.js"></script>
   <script src="../js/math-render-cache.js"></script>
+  <script src="../js/config.js"></script>
   <script src="../js/component-loader.js"></script>
 </body>
 </html>

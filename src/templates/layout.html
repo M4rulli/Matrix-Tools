@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="it" style="background-color: #ffffff; transition: none;">
+<head>
+    <script src="/js/layout-state.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>{% block title %}Matrix Tools{% endblock %}</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- MathLive CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/mathlive/dist/mathlive-static.css">
+
+    <script>
+    function isMobileDevice() {
+        return window.innerWidth <= 768;
+    }
+    </script>
+    
+    <!-- Custom CSS -->
+    <link href="/css/style.css" rel="stylesheet">
+    <link href="/css/panels-theme.css" rel="stylesheet">
+</head>
+<body>
+    {% set sidebar_id_suffix = 'mobile' %}
+    {% include 'includes/_mobile_sidebar.html' %}
+    <!-- Mobile Sidebar Included -->
+    <div class="wrapper">
+        <!-- Sidebar -->
+        {% set sidebar_id_suffix = 'desktop' %}
+        <nav id="sidebar" class="sidebar">
+            {% include 'includes/_sidebar_content.html' %}
+        </nav>
+
+
+        <!-- Notebook Modal - Incluso da file separato -->
+        {% include 'notebook-modal.html' %}
+
+        <!-- Main Content -->
+        <div id="content" class="content">
+            <!-- Top Navigation -->
+            <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+                <div class="container-fluid">
+                    <button type="button" id="sidebarCollapse" class="btn btn-outline-primary me-3" onclick="toggleSidebar(); event.stopPropagation();">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    
+                    {% block topbar_title %}
+                    <h2 class="navbar-brand mb-0 fw-bold">
+                        Matrix Tools
+                    </h2>
+                    {% endblock %}
+                    
+                    <div class="topbar-controls ms-auto">
+                        <button id="serverStatusBadge" class="btn btn-outline-secondary btn-sm server-status-badge status-booting" type="button" aria-label="Avvio server..." data-status-label="Avvio server...">
+                            <span class="server-status-dot" aria-hidden="true"></span>
+                        </button>
+
+                        <!-- Theme Toggle Switch -->
+                        <div class="theme-switch-container">
+                            <label class="theme-switch" for="themeToggle">
+                                <input type="checkbox" id="themeToggle" onchange="toggleTheme()">
+                                <span class="theme-slider">
+                                    <i class="fas fa-sun theme-icon sun-icon"></i>
+                                    <i class="fas fa-moon theme-icon moon-icon"></i>
+                                </span>
+                            </label>
+                        </div>
+
+                        <button class="btn btn-outline-info btn-sm language-toggle-btn" id="languageToggleBtn" type="button" onclick="toggleLanguage()" aria-label="Cambia lingua" title="Cambia lingua">
+                            <img
+                                id="languageToggleFlag"
+                                class="flag-icon"
+                                src="https://flagcdn.com/w40/it.png"
+                                srcset="https://flagcdn.com/w80/it.png 2x"
+                                alt="Italiano"
+                                data-no-i18n="true"
+                            >
+                        </button>
+                        
+                        <button class="btn btn-outline-info btn-sm help-icon-btn" onclick="showHelp()" aria-label="Aiuto" title="Aiuto">
+                            <span class="help-btn-question" data-no-i18n="true">?</span>
+                            <span class="visually-hidden">Aiuto</span>
+                        </button>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Main Content Area -->
+            <div class="container-fluid" style="margin-top: 100px; padding: 0rem 1.5rem 0rem 0rem !important;">
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show" role="alert">
+                                <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' }} me-2"></i>
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <!-- Algorithm Content -->
+                {% block algorithm_content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Help Modal -->
+    <div class="modal fade" id="helpModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content help-modal">
+        <div class="modal-header">
+            <h5 class="modal-title">
+            <i class="fas fa-question-circle me-2"></i>Guida all'utilizzo della piattaforma
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body help-modal-body">
+          <div class="row">
+            <!-- Column 1: Navigazione -->
+            <div class="col-md-4 mb-3">
+              <h6 class="fw-bold">Navigazione</h6>
+              <ul class="small list-unstyled">
+                <li class="mb-2">
+                  <i class="fas fa-bars me-2 text-primary"></i>
+                  Clicca sull’<strong>icona hamburger</strong> (☰) per aprire la sidebar di navigazione e selezionare algoritmi per categoria.
+                </li>
+                <li class="mb-2">
+                  <i class="fas fa-search me-2 text-primary"></i>
+                  Usa la <strong>barra di ricerca</strong> per individuare rapidamente un algoritmo tramite nome, descrizione o categoria.
+                </li>
+                <li class="mb-2">
+                  <i class="fas fa-adjust me-2 text-primary"></i>
+                  Cambia il <strong>tema</strong> (chiaro/scuro) con l’interruttore in alto a destra, disponibile su desktop e mobile.
+                </li>
+              </ul>
+            </div>
+            <!-- Column 2: Input e Scorciatoie -->
+            <div class="col-md-4 mb-3">
+              <h6 class="fw-bold">Input e Scorciatoie</h6>
+              <ul class="small list-unstyled">
+                <li class="mb-2">
+                  <i class="fas fa-keyboard me-2 text-primary"></i>
+                  Apri la <strong>tastiera matematica interattiva</strong> per inserire espressioni in notazione scientifica o LaTeX.
+                </li>
+                <li class="mb-2">
+                  <i class="fas fa-mouse-pointer me-2 text-primary"></i>
+                  Naviga tra i campi di input con:
+                  <ul class="mt-1">
+                    <li><kbd>→</kbd> / <kbd>←</kbd> su tastiera fisica</li>
+                    <li>Freccette virtuali sulla tastiera mobile</li>
+                  </ul>
+                </li>
+                <li class="mb-2">
+                  <i class="fas fa-superscript me-2 text-primary"></i>
+                  Usa <code>^</code> per le potenze (apice) e <code>_</code> per i pedici (underscore).
+                </li>
+                <li class="mb-2">
+                  Digita <kbd>/</kbd> per inserire frazioni (es. <code>a/b</code> → \(\frac{a}{b}\)).
+                </li>
+                <li class="mb-2">
+                  Digita <kbd>*</kbd> per il simbolo moltiplicativo (\(\cdot\)).
+                </li>
+              </ul>
+            </div>
+            <!-- Column 3: Notebook -->
+            <div class="col-md-4 mb-3">
+              <h6 class="fw-bold">Quaderno</h6>
+              <p class="small mb-2">
+                <i class="fas fa-play me-2 text-primary"></i>
+                Dopo aver calcolato un esercizio, clicca sul pulsante <strong>Calcola</strong> e poi su <strong>Aggiungi al quaderno</strong> <i class="fas fa-plus ms-2 text-primary"></i> per salvare l’esercizio.
+              </p>
+              <p class="small mb-0">
+                È possibile esportare il quaderno in <strong>LaTeX</strong> o <strong>PDF</strong> per rivedere tutti gli esercizi completati.
+              </p>
+            </div>
+            
+          </div>
+          <!-- Referral section -->
+
+          <div class="row mt-4">
+            <div class="col text-center">
+              <h6 class="fw-bold">Riferimenti utili</h6>
+              <!-- Pulsanti placeholder -->
+              <button class="btn btn-outline-secondary btn-sm me-2">
+                <i class="fab fa-github me-1"></i>GitHub
+              </button>
+              <button class="btn btn-outline-secondary btn-sm">
+                <i class="fas fa-comment-dots me-1"></i>Feedback
+              </button>
+            </div>
+          </div>
+        </div>
+        </div>
+    </div>
+    </div>
+
+
+    <!-- Notebook System JS (must load prima dell’export) -->
+    <script src="/js/notebook.js"></script>
+
+    <!-- Notebook Export JS -->
+    <script src="/js/notebook-export.js"></script>
+
+    <!-- Include Notebook Modal -->
+    {% include 'notebook-modal.html' %}
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- MathLive JS -->
+    <script src="https://unpkg.com/mathlive@0.92.0/dist/mathlive.min.js"></script>
+    <script src="/js/site-i18n.js"></script>
+    <script src="/js/math-render-cache.js"></script>
+    <script src="/js/server-status.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script>
+        // Update UI controls after DOM loads  
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // Initialize MathLive
+            const mathfield = document.getElementById('mathfield');
+            if (mathfield) {
+                const hiddenInput = document.getElementById('function');
+                
+                mathfield.addEventListener('input', function() {
+                    hiddenInput.value = mathfield.value;
+                });
+                
+                hiddenInput.value = mathfield.value;
+            }
+            
+            // Initialize theme toggle switch position
+            const currentTheme = document.documentElement.getAttribute('data-theme') || window.__initialTheme || 'dark';
+            const themeToggle = document.getElementById('themeToggle');
+            if (themeToggle) {
+                themeToggle.checked = currentTheme === 'dark';
+            }
+            
+            // Search functionality ready (debug removed)
+            
+            // Restore section state from localStorage
+            restoreSectionStateFromLocalStorage();
+
+            if (typeof window.initServerStatus === 'function') {
+                window.initServerStatus();
+            }
+
+            // Add js-loaded class to <html> when DOM is fully loaded
+            document.documentElement.classList.add('js-loaded');
+
+
+            // Listener centrale per evento personalizzato
+            document.addEventListener('notebookUpdated', function(e) {
+                if (typeof e.detail?.count === 'number' && typeof e.detail?.suffix === 'string') {
+                    updateExerciseCountForSidebar(e.detail.suffix, e.detail.count);
+                }
+            });
+        });
+
+        function updateExerciseCountForSidebar(suffix, newCount) {
+            const target = document.getElementById(`exercise-count-${suffix}`);
+            if (target) {
+                target.textContent = newCount;
+            }
+        };
+
+        // Simple sidebar toggle
+        function toggleSidebar() {
+            const wrapper = document.querySelector('.wrapper');
+            const sidebar = document.getElementById('sidebar');
+            
+            wrapper.classList.toggle('sidebar-expanded');
+            sidebar.classList.toggle('expanded');
+            
+            // Persist state
+            localStorage.setItem('sidebarExpanded', wrapper.classList.contains('sidebar-expanded'));
+        }
+
+        // Search functionality with enhanced data
+        window.algorithms = [
+            {
+                name: 'Autovalori e Autovettori',
+                url: 'eigenvalues-eigenvectors.html',
+                category: 'Algebra Lineare',
+                icon: 'fas fa-cubes',
+                description: 'Calcolo di autovalori e autovettori di matrici (fino a 4×4)'
+            },
+            {
+                name: 'Decomposizione Spettrale',
+                url: 'spectral-decomposition.html',
+                category: 'Teoria dei Controlli',
+                icon: 'fas fa-wave-square',
+                description: 'Calcolo della decomposizione spettrale di una matrice quadrata A. Viene inoltre determinata la matrice esponenziale e^At e la potenza A^t.'
+            },
+            {
+                name: 'Determinante (Laplace)',
+                url: 'laplace-determinant.html',
+                category: 'Algebra Lineare',
+                icon: 'fas fa-dice-four',
+                description: 'Calcolo del determinante di una matrice (fino a 4×4) tramite lo sviluppo di Laplace'
+            },
+            {
+                name: 'Sistemi Lineari',
+                url: 'linear-systems.html',
+                category: 'Algebra Lineare',
+                icon: 'fas fa-equals',
+                description: 'Risoluzione di sistemi lineari (2–4 equazioni) con eliminazione di Gauss'
+            },
+            {
+                name: 'Diagramma di Hasse',
+                url: 'hasse-diagram.html',
+                category: 'Algebra e Logica',
+                icon: 'fas fa-sitemap',
+                description: 'Rappresentazione grafica di relazioni di ordine parziale'
+            },
+            {
+                name: "Identità di Bézout",
+                url: "bezout-identity.html",
+                category: "Algebra e Logica",
+                icon: "fas fa-equals",
+                description: "Trova una combinazione lineare di due numeri interi che genera il loro massimo comune divisore",
+            },
+            {
+                name: 'Polinomi Booleani',
+                url: 'boolean-polynomials.html',
+                category: 'Algebra e Logica',
+                icon: 'fas fa-code-branch',
+                description: 'Analisi e semplificazione di espressioni logiche booleane'
+            },
+            {
+                name: 'Potenze Modulari',
+                url: 'modular-powers.html',
+                category: 'Algebra e Logica',
+                icon: 'fas fa-divide',
+                description: 'Calcolo efficiente di a^b mod n utilizzato in crittografia'
+            },
+            {
+                name: 'Teorema Cinese del Resto',
+                url: 'chinese-remainder-theorem.html',
+                category: 'Algebra e Logica',
+                icon: 'fas fa-chess-board',
+                description: 'Sistema di congruenze e soluzioni tramite il Teorema Cinese del Resto'
+            },
+            {
+                name: 'Studio di Funzione',
+                url: 'function-study.html',
+                category: 'Analisi Matematica',
+                icon: 'fas fa-chart-line',
+                description: 'Studio completo di funzioni reali: dominio, limiti, derivabilità, monotonia, estremi'
+            },
+            {
+                name: 'Condizioni di Complementarità',
+                url: 'complementary-conditions.html',
+                category: 'Ricerca Operativa',
+                icon: 'fas fa-handshake',
+                description: 'Verifica delle condizioni di complementarità per soluzioni di programmazione lineare'
+            },
+            {
+                name: 'Metodo del Simplesso',
+                url: 'simplex.html',
+                category: 'Ricerca Operativa',
+                icon: 'fas fa-table',
+                description: 'Risoluzione di problemi di programmazione lineare con il metodo del simplesso'
+            },
+            { 
+                name: 'Linearizzazione', 
+                url: 'linearization.html', 
+                category: 'Teoria dei Controlli', 
+                icon: 'fas fa-project-diagram',
+                description: 'Linearizzazione di sistemi dinamici non lineari intorno ai punti di equilibrio'
+            },
+            {
+                name: 'Equazioni Differenziali',
+                url: 'differential-equations.html',
+                category: 'Teoria dei Controlli',
+                icon: 'fas fa-wave-square',
+                description: 'Risoluzione di equazioni differenziali lineari a coefficienti costanti'
+            },
+            {
+                name: 'Equazioni alle Differenze',
+                url: 'difference-equations.html',
+                category: 'Teoria dei Controlli',
+                icon: 'fas fa-step-forward',
+                description: 'Risoluzione di equazioni alle differenze lineari con operatore di shift in avanti'
+            },
+            {
+                name: 'Sistemi Dinamici',
+                url: 'dynamical-systems.html',
+                category: 'Teoria dei Controlli',
+                icon: 'fas fa-sliders-h',
+                description: 'Calcolo di uscita e stato forzato per sistemi lineari di equazioni differenziali'
+            }
+        ];
+
+        // Expose new event-driven search handlers globally
+        window.handleSearchInput = handleSearchInput;
+        window.clearSearch = clearSearch;
+
+        // New functions for handling search from HTML
+        function handleSearchInput(suffix, event) {
+            const searchInput = document.getElementById(`sidebarSearch-${suffix}`);
+            const searchClear = document.getElementById(`searchClear-${suffix}`);
+            const searchResults = document.getElementById(`searchResults-${suffix}`);
+
+            if (!searchInput || !searchClear || !searchResults) {
+                console.warn(`[Search Input] Elementi non trovati per: ${suffix}`);
+                return;
+            }
+
+            const query = event.target.value.toLowerCase().trim();
+            if (query.length === 0) {
+                searchResults.style.display = 'none';
+                searchClear.style.display = 'none';
+                return;
+            }
+
+            searchClear.style.display = 'flex';
+            const filtered = algorithms.filter(algo =>
+                algo.name.toLowerCase().includes(query) ||
+                algo.category.toLowerCase().includes(query) ||
+                algo.description.toLowerCase().includes(query)
+            );
+
+            if (filtered.length > 0) {
+                showSearchResults(filtered, query, searchResults);
+            } else {
+                showNoResults(query, searchResults);
+            }
+        }
+
+        function clearSearch(suffix, event) {
+            const searchInput = document.getElementById(`sidebarSearch-${suffix}`);
+            const searchClear = document.getElementById(`searchClear-${suffix}`);
+            const searchResults = document.getElementById(`searchResults-${suffix}`);
+
+            if (!searchInput || !searchClear || !searchResults) {
+                console.warn(`[Search Clear] Elementi non trovati per: ${suffix}`);
+                return;
+            }
+
+            searchInput.value = '';
+            searchResults.style.display = 'none';
+            searchResults.innerHTML = '';
+            searchClear.style.display = 'none';
+            searchInput.focus();
+        }
+
+        function showSearchResults(results, query = '', container) {
+            if (!container) return;
+            container.innerHTML = '';
+            results.forEach(algo => {
+                const div = document.createElement('div');
+                div.className = 'search-result';
+                div.innerHTML = `
+                    <div class="search-result-content">
+                        <div class="search-result-header">
+                            <i class="${algo.icon} search-result-icon"></i>
+                            <span class="search-result-title">${algo.name}</span>
+                            <span class="search-result-category">${algo.category}</span>
+                        </div>
+                        <div class="search-result-description">${algo.description}</div>
+                    </div>`;
+                div.addEventListener('click', () => window.location.href = algo.url);
+                container.appendChild(div);
+            });
+            container.style.display = 'block';
+        }
+
+        function showNoResults(query, container) {
+            if (!container) return;
+            container.innerHTML = `<div class="search-result" style="cursor: default; opacity: 0.6; text-align: center; padding: 2rem 1rem;">
+                <i class="fas fa-search" style="font-size: 2rem; color: rgba(255,255,255,0.3); margin-bottom: 1rem;"></i>
+                <div class="search-result-title" style="color: rgba(255,255,255,0.6);">Nessun risultato per "${query}"</div>
+                <div style="font-size: 0.8rem; color: rgba(255,255,255,0.4); margin-top: 0.5rem;">Prova con altri termini di ricerca</div>
+            </div>`;
+            container.style.display = 'block';
+        }
+
+        // Section toggle functionality compatibile with sidebar mobile e desktop
+        function toggleSection(id, event) {
+            const button = event?.currentTarget || document.querySelector(`button.category-header[onclick*="'${id}'"]`);
+            if (!button) return;
+
+            const container = button.nextElementSibling;
+            if (!container || !container.classList.contains('algorithm-container')) return;
+
+            const isCollapsed = container.classList.contains('collapsed');
+            container.classList.toggle('collapsed', !isCollapsed);
+            button.classList.toggle('expanded', isCollapsed);
+
+            localStorage.setItem(`section-${id}`, isCollapsed ? 'expanded' : 'collapsed');
+        }
+        
+        window.toggleSection = toggleSection;
+
+        // (restoreSectionState e waitForSectionsAndRestoreState rimossi)
+
+
+
+        // Restore section expanded/collapsed state from localStorage
+        function restoreSectionStateFromLocalStorage(root = document) {
+            const allButtons = root.querySelectorAll('button.category-header');
+
+            allButtons.forEach(btn => {
+                const idMatch = btn.getAttribute('onclick')?.match(/'([^']+)'/);
+                if (!idMatch) return;
+                const id = idMatch[1];
+                const container = btn.nextElementSibling;
+                if (!container || !container.classList.contains('algorithm-container')) return;
+
+                const stato = localStorage.getItem(`section-${id}`);
+                if (stato === 'expanded') {
+                    container.classList.remove('collapsed');
+                    btn.classList.add('expanded');
+                } else if (stato === 'collapsed') {
+                    container.classList.add('collapsed');
+                    btn.classList.remove('expanded');
+                }
+            });
+        }
+
+        // Show help modal
+        function showHelp() {
+            const helpModal = new bootstrap.Modal(document.getElementById('helpModal'));
+            helpModal.show();
+        }
+
+        // Form submission with loading state
+        const form = document.getElementById('calculatorForm');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                const btn = document.getElementById('calculateBtn');
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Calcolando...';
+                btn.disabled = true;
+            });
+        }
+    </script>
+    
+</script>
+
+    <!-- MathJax for LaTeX rendering -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</body>
+</html> 

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="it" data-page-title="Matrix Tools">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Matrix Tools</title>
+  <link rel="icon" href="/assets/icons/favicon.ico" sizes="any">
+  <link rel="icon" type="image/svg+xml" href="/assets/icons/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/assets/icons/site.webmanifest">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="/css/style.css" rel="stylesheet" />
+  <link href="/css/panels-theme.css" rel="stylesheet" />
+  <style>
+    .home-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .home-link {
+      border: 1px solid var(--field-border, #d0d7e2);
+      border-radius: 14px;
+      background: var(--panel-surface, rgba(255, 255, 255, 0.75));
+      box-shadow: var(--panel-shadow, 0 8px 24px rgba(15, 23, 42, 0.08));
+      text-decoration: none;
+      color: inherit;
+      padding: 1rem;
+      display: block;
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+    .home-link:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--panel-shadow-hover, 0 14px 28px rgba(15, 23, 42, 0.12));
+    }
+
+    .home-link h6 {
+      margin: 0;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <div id="navbar"></div>
+
+  <main class="container-fluid" style="margin-top: 100px; padding: 0rem 1.5rem 0rem 0rem !important;">
+    <div class="row">
+      <div class="col-12">
+        <div class="card calculator-card shadow-sm">
+          <div class="card-header bg-primary text-white">
+            <h5 class="card-title mb-0"><i class="fas fa-layer-group me-2"></i>Moduli disponibili</h5>
+          </div>
+          <div class="card-body">
+            <div class="home-grid" id="homeGrid"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/layout-state.js"></script>
+  <script src="/js/site-i18n.js"></script>
+  <script src="/js/component-loader.js"></script>
+  <script>
+    (function renderHomeLinks() {
+      const lang = (window.location.pathname.split('/').filter(Boolean)[0] || 'it');
+      const pages = [
+        ['Linearizzazione', 'linearization.html'],
+        ['Decomposizione Spettrale', 'spectral-decomposition.html'],
+        ['Equazioni Differenziali', 'differential-equations.html'],
+        ['Equazioni alle Differenze', 'difference-equations.html'],
+        ['Sistemi Dinamici', 'dynamical-systems.html'],
+        ['Potenze Modulari', 'modular-powers.html'],
+        ['Diagramma di Hasse', 'hasse-diagram.html'],
+        ['Polinomi Booleani', 'boolean-polynomials.html'],
+        ['Teorema Cinese del Resto', 'chinese-remainder-theorem.html'],
+        ['Identità di Bézout', 'bezout-identity.html'],
+        ['Determinante con Laplace', 'laplace-determinant.html'],
+        ['Autovalori e Autovettori', 'eigenvalues-eigenvectors.html'],
+        ['Sistemi Lineari', 'linear-systems.html'],
+        ['Metodo del Simplesso', 'simplex.html'],
+        ['Condizioni di Complementarità', 'complementary-conditions.html'],
+        ['Studio di Funzione', 'function-study.html'],
+        ['Integrali', 'integrals.html'],
+      ];
+
+      const target = document.getElementById('homeGrid');
+      if (!target) return;
+
+      target.innerHTML = pages.map(([label, slug]) => (
+        `<a class="home-link" href="/${lang}/${slug}"><h6>${label}</h6></a>`
+      )).join('');
+    })();
+  </script>
+</body>
+</html>

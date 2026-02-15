@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="it" data-page-title="Sistemi Dinamici">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sistemi Dinamici - Matrix Tools</title>
+  <link rel="icon" href="/assets/icons/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/svg+xml" href="/assets/icons/favicon.svg" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png" />
+  <link rel="manifest" href="/assets/icons/site.webmanifest" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/mathlive/dist/mathlive-static.css" />
+  <link href="/css/style.css" rel="stylesheet" />
+  <link href="/css/panels-theme.css" rel="stylesheet" />
+  
+</head>
+<body>
+  <div id="navbar"></div>
+
+  <div class="container-fluid" style="margin-top: 100px; padding: 0rem 1.5rem 0rem 0rem !important;">
+    <style>
+  :root {
+    --sd-bg: #f6f8fb;
+    --sd-surface: var(--panel-surface, #ffffff);
+    --sd-surface-soft: var(--panel-surface-soft, #f8fafc);
+    --sd-border: var(--panel-border, #e2e8f0);
+    --sd-text: var(--panel-text, #0f172a);
+    --sd-muted: var(--panel-muted, #475569);
+    --sd-primary: var(--panel-input-header-a, #0f766e);
+    --sd-primary-dark: var(--panel-input-header-b, #115e59);
+    --sd-primary-soft: var(--panel-focus-ring, rgba(15, 118, 110, 0.12));
+    --sd-success: var(--panel-output-header-a, #166534);
+    --sd-success-dark: var(--panel-output-header-b, #14532d);
+    --sd-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+    --sd-shadow-soft: var(--panel-shadow, 0 3px 10px rgba(15, 23, 42, 0.06));
+  }
+
+  .sd-page {
+    color: var(--sd-text);
+  }
+
+  .math-input {
+    font-size: 22px;
+    display: inline-block;
+    margin: 0 auto;
+    border-radius: 12px;
+    border: 1px solid var(--sd-border);
+    padding: 0.35rem 0.45rem;
+    background: var(--sd-surface);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  }
+
+  .step-title {
+    margin-top: 1rem;
+    font-weight: 700;
+    color: #1e293b;
+  }
+
+  .centered-math {
+    text-align: center;
+    background: var(--sd-surface-soft);
+    border: 1px solid var(--sd-border);
+    border-radius: 10px;
+    padding: 0.8rem 0.6rem;
+  }
+
+  .rotate-icon {
+    transition: transform 0.3s ease;
+  }
+
+  .sd-panel {
+    background: var(--sd-surface);
+    border: 1px solid var(--sd-border);
+    border-radius: 16px;
+    box-shadow: var(--sd-shadow-soft);
+    overflow: hidden;
+  }
+
+  .sd-panel.calculator-card {
+    background: linear-gradient(160deg, #ffffff 0%, #f9fcff 100%);
+  }
+
+  .sd-panel .card-header {
+    padding: 0.95rem 1.2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .sd-panel .card-title {
+    letter-spacing: 0.2px;
+    font-weight: 700;
+  }
+
+  .sd-header-input {
+    background: linear-gradient(135deg, var(--sd-primary) 0%, #0e7490 100%);
+  }
+
+  .sd-header-output {
+    background: linear-gradient(135deg, var(--sd-success) 0%, var(--sd-success-dark) 100%);
+  }
+
+  .sd-panel .card-body {
+    padding: 1.15rem;
+  }
+
+  .sd-label {
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 0.35rem;
+  }
+
+  .sd-form-select {
+    border-radius: 10px;
+    border-color: var(--sd-border);
+    padding-top: 0.45rem;
+    padding-bottom: 0.45rem;
+  }
+
+  .sd-form-select:focus,
+  .sd-btn:focus {
+    box-shadow: 0 0 0 3px var(--sd-primary-soft);
+    border-color: rgba(15, 118, 110, 0.5);
+  }
+
+  .sd-description {
+    border-radius: 12px;
+    background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+    border: 1px solid var(--sd-border);
+  }
+
+  .sd-description p {
+    color: #334155 !important;
+  }
+
+  .eq-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.75rem;
+  }
+
+  .sd-note {
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    color: var(--sd-muted);
+    border-radius: 10px;
+    padding: 0.65rem 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  .sd-actions {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .sd-btn {
+    border-radius: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+    border-width: 1px;
+    min-width: 145px;
+  }
+
+  .sd-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
+  }
+
+  .sd-btn:disabled {
+    opacity: 0.6;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .sd-btn-primary {
+    background: linear-gradient(135deg, var(--sd-primary) 0%, #0f766e 100%);
+    border-color: var(--sd-primary);
+    color: #fff;
+  }
+
+  .sd-btn-primary:hover {
+    filter: brightness(0.97);
+    color: #fff;
+  }
+
+  .sd-btn-secondary {
+    background: #fff;
+    border-color: #cbd5e1;
+    color: #334155;
+  }
+
+  .sd-btn-secondary:hover {
+    border-color: #94a3b8;
+    color: #0f172a;
+  }
+
+  .sd-output {
+    min-height: 220px;
+    background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+  }
+
+  .empty-state {
+    background: var(--sd-surface-soft);
+    border: 1px dashed #cbd5e1;
+    border-radius: 14px;
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 2rem 1rem !important;
+  }
+
+  .empty-state h6 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1e293b;
+  }
+
+  .result-section {
+    background: #ffffff;
+    border: 1px solid var(--sd-border);
+    border-radius: 12px;
+    padding: 0.95rem 1rem 0.35rem;
+    box-shadow: var(--sd-shadow-soft);
+  }
+
+  .sd-loader {
+    background: var(--sd-surface-soft);
+    border: 1px solid var(--sd-border);
+    border-radius: 12px;
+    padding: 1.4rem 0.8rem;
+  }
+
+  .alert.alert-danger {
+    border-radius: 12px;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    background: rgba(239, 68, 68, 0.08);
+    color: #7f1d1d;
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 767.98px) {
+    .sd-panel .card-body {
+      padding: 1rem 0.9rem;
+    }
+
+    .math-input {
+      font-size: 20px;
+    }
+
+    .sd-btn {
+      width: 100%;
+      min-width: 0;
+    }
+  }
+</style>
+
+<div class="row sd-page">
+  <div class="col-12 mb-4">
+    <div class="card sd-panel calculator-card shadow-sm">
+      <div class="card-header sd-header-input text-white">
+        <h5 class="card-title mb-0"><i class="fas fa-edit me-2"></i>Input</h5>
+      </div>
+      <div class="card-body">
+        <div class="mb-3">
+          <button id="toggleDescrizione"
+                  class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#descrizioneSistemi"
+                  aria-expanded="false"
+                  aria-controls="descrizioneSistemi">
+            <i id="descrizioneIcon" class="fas fa-chevron-down rotate-icon"></i>
+            <span id="descrizioneText">Mostra descrizione</span>
+          </button>
+        </div>
+
+        <div id="descrizioneSistemi" class="collapse mb-3">
+          <div class="card card-body mt-2 sd-description">
+            <p class="text-muted mb-2">
+              Inserisci un sistema lineare in forma di stato con matrici \(A,B,C,D\):
+              \[
+                \dot{x}(t)=A\,x(t)+B\,u(t),\qquad y(t)=C\,x(t)+D\,u(t).
+              \]
+              In modalità discreta (\(T=\mathbb{Z}\)) la dinamica diventa:
+              \[
+                x(t+1)=A\,x(t)+B\,u(t),\qquad y(t)=C\,x(t)+D\,u(t).
+              \]
+            </p>
+            <p class="text-muted mb-0 small">
+              Backend disponibile: \(T=\mathbb{R}\) per \(y(t)\) e \(x(t)\), \(T=\mathbb{Z}\) per \(y(z)\).
+            </p>
+          </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+          <div class="col-12 col-md-4">
+            <label class="form-label sd-label">Dominio:</label>
+            <select id="domainSelect" class="form-select form-select-sm sd-form-select">
+              <option value="R" selected>T = R (continuo)</option>
+              <option value="Z">T = Z (discreto)</option>
+            </select>
+          </div>
+          <div class="col-12 col-md-4">
+            <label class="form-label sd-label">Dimensione sistema:</label>
+            <select id="systemSizeSelect" class="form-select form-select-sm sd-form-select">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3" selected>3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mb-2">
+          <label class="form-label sd-label">Inserisci il sistema dinamico:</label>
+        </div>
+
+        <div class="eq-row" style="width:100%">
+          <math-field id="SystemField"
+                      class="math-input"
+                      delete-mode="off"
+                      default-mode="math"
+                      read-only="partial"
+                      style="width:100%; min-width:320px;">
+          </math-field>
+        </div>
+
+        <div class="row g-3 mt-1">
+          <div class="col-12 col-lg-6">
+            <label class="form-label sd-label">Ingresso \(u(t)\):</label>
+            <math-field id="UField"
+                        class="math-input"
+                        delete-mode="off"
+                        default-mode="math"
+                        read-only="partial"
+                        style="width:100%;">u(t)=\placeholder[uexpr]{0}</math-field>
+          </div>
+          <div class="col-12 col-lg-6">
+            <label class="form-label sd-label">Stato iniziale \(x_0\) (opzionale):</label>
+            <math-field id="X0Field"
+                        class="math-input"
+                        delete-mode="off"
+                        default-mode="math"
+                        read-only="partial"
+                        style="width:100%;"></math-field>
+          </div>
+        </div>
+
+        <div class="sd-note mb-2 mt-2">
+          Le celle vuote vengono considerate zero. In \(T=\mathbb{Z}\), il calcolo di \(x(t)\) non è ancora disponibile lato backend.
+        </div>
+
+        <div class="sd-actions mt-2">
+          <button id="computeYBtn" class="btn btn-sm px-3 sd-btn sd-btn-primary" onclick="computeY()">
+            <span id="computeYIcon"><i class="fas fa-play me-2"></i></span>
+            Calcola \(y(t)\)
+          </button>
+          <button id="computeXBtn" class="btn btn-sm px-3 sd-btn sd-btn-primary" onclick="computeX()">
+            <span id="computeXIcon"><i class="fas fa-play me-2"></i></span>
+            Calcola \(x(t)\)
+          </button>
+          <button class="btn btn-sm px-3 sd-btn sd-btn-secondary" onclick="resetSistemaDinamico()">
+            <i class="fas fa-eraser me-2"></i>Pulisci
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="card sd-panel output-card shadow-sm">
+      <div class="card-header sd-header-output text-white">
+        <h5 class="card-title mb-0"><i class="fas fa-stream me-2"></i>Output</h5>
+      </div>
+      <div class="card-body sd-output" id="output">
+        <div class="empty-state text-center text-muted py-5">
+          <i class="fas fa-sliders-h fa-3x mb-3 opacity-50"></i>
+          <h6>Pronto</h6>
+          <p class="small">Configura il sistema e scegli “Calcola \(y(t)\)” o “Calcola \(x(t)\)”.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function buildMatrixLatex(prefix, rows, cols, defaultValue = '') {
+  const r = [];
+  for (let i = 0; i < rows; i++) {
+    const c = [];
+    for (let j = 0; j < cols; j++) {
+      c.push(`\\placeholder[${prefix}${i}${j}]{${defaultValue}}`);
+    }
+    r.push(c.join('&'));
+  }
+  return `\\begin{bmatrix}${r.join('\\\\')}\\end{bmatrix}`;
+}
+
+function buildVectorLatex(prefix, n, defaultValue = '') {
+  const rows = [];
+  for (let i = 0; i < n; i++) {
+    rows.push(`\\placeholder[${prefix}${i}]{${defaultValue}}`);
+  }
+  return `\\begin{bmatrix}${rows.join('\\\\')}\\end{bmatrix}`;
+}
+
+function updateDomainLabels() {
+  const domain = document.getElementById('domainSelect').value;
+  const computeXBtn = document.getElementById('computeXBtn');
+
+  if (domain === 'R') {
+    computeXBtn.disabled = false;
+    computeXBtn.title = '';
+  } else {
+    computeXBtn.disabled = true;
+    computeXBtn.title = 'Calcolo stato non disponibile per T = Z';
+  }
+
+  // Rebuild the unified system field so the LHS updates (dot{x}(t) vs x(t+1))
+  refreshSystemFields();
+}
+
+function refreshSystemFields() {
+  const n = parseInt(document.getElementById('systemSizeSelect').value, 10);
+  const domain = document.getElementById('domainSelect').value;
+  const SystemField = document.getElementById('SystemField');
+  const X0Field = document.getElementById('X0Field');
+
+  const lhs = domain === 'R' ? '\\dot{x}(t)' : 'x(t+1)';
+
+  const A = buildMatrixLatex('a', n, n, '0');
+  const B = buildMatrixLatex('b', n, 1, '0');
+  const C = buildMatrixLatex('c', 1, n, '0');
+  const D = '\\placeholder[d00]{0}';
+
+  const systemLatex = `\\begin{cases}${lhs}=${A}x(t)+${B}u(t)\\\\y(t)=${C}x(t)+${D}u(t)\\end{cases}`;
+
+  SystemField.setValue(systemLatex);
+  X0Field.setValue(`x_0=${buildVectorLatex('x0', n, '0')}`);
+}
+
+function createErrorAlert(msg) {
+  return (
+    '<div class="alert alert-danger">' +
+      '<i class="fas fa-exclamation-triangle me-2"></i>' +
+      '<strong>Errore.</strong> ' + msg +
+    '</div>'
+  );
+}
+
+function matrixFromField(field, prefix, rows, cols) {
+  const out = [];
+  for (let i = 0; i < rows; i++) {
+    const row = [];
+    for (let j = 0; j < cols; j++) {
+      const id = `${prefix}${i}${j}`;
+      const v = (field.getPromptValue(id) || '0').trim().replace(/\\,/g, '');
+      row.push(v === '' ? '0' : v);
+    }
+    out.push(row);
+  }
+  return out;
+}
+
+function vectorFromField(field, prefix, n) {
+  const out = [];
+  for (let i = 0; i < n; i++) {
+    const id = `${prefix}${i}`;
+    const v = (field.getPromptValue(id) || '0').trim().replace(/\\,/g, '');
+    out.push(v === '' ? '0' : v);
+  }
+  return out;
+}
+
+function matrixToLatex(matrix) {
+  return `\\begin{bmatrix}${matrix.map(r => r.join(' & ')).join('\\\\')}\\end{bmatrix}`;
+}
+
+function renderResult(title, inputLatex, res, algorithmLabel) {
+  const output = document.getElementById('output');
+  const steps = Array.isArray(res.latex) ? res.latex : [];
+  const html =
+    `<p class="step-title"><b>0)</b> ${title}</p><p class="centered-math">\\[${inputLatex}\\]</p>` +
+    steps.map((step, i) =>
+      `<p class="step-title"><b>${i + 1})</b> ${step.title}</p><p class="centered-math">\\[${step.content}\\]</p>`
+    ).join('');
+
+  output.innerHTML = `<div class="result-section">${html}</div>`;
+  output.dataset.latex = html;
+
+  const payload = {
+    title: algorithmLabel,
+    algorithm: algorithmLabel,
+    input: inputLatex,
+    htmlOutput: output.innerHTML,
+    outputLatex: html,
+    rawData: res
+  };
+  window.currentExercise = payload;
+  injectSaveButton(output.querySelector('.result-section'), payload);
+
+  if (window.MathJax?.typesetPromise) {
+    MathJax.typesetPromise([output]).then(() => {
+      document.querySelector('.output-card')?.scrollIntoView({ behavior: 'smooth' });
+    });
+  }
+}
+
+function collectSystemPayload() {
+  const n = parseInt(document.getElementById('systemSizeSelect').value, 10);
+  const domain = document.getElementById('domainSelect').value;
+  const SystemField = document.getElementById('SystemField');
+  const UField = document.getElementById('UField');
+  const X0Field = document.getElementById('X0Field');
+
+  const A = matrixFromField(SystemField, 'a', n, n);
+  const B = matrixFromField(SystemField, 'b', n, 1);
+  const C = matrixFromField(SystemField, 'c', 1, n);
+  const D = (SystemField.getPromptValue('d00') || '0').trim() || '0';
+  const u = (UField.getPromptValue('uexpr') || '0').trim() || '0';
+  const x0 = vectorFromField(X0Field, 'x0', n);
+
+  const lhs = domain === 'R' ? '\\dot{x}(t)' : 'x(t+1)';
+  const inputLatex = `\\begin{cases}${lhs}=${matrixToLatex(A)}x(t)+${matrixToLatex(B)}u(t)\\\\y(t)=${matrixToLatex(C)}x(t)+${D}u(t)\\end{cases}`;
+
+  return {
+    domain,
+    payload: { A, B, C, D, u, x0 },
+    inputLatex
+  };
+}
+
+async function callEndpoint(endpoint, body) {
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  const data = await response.json();
+  if (!response.ok || data.success === false) {
+    throw new Error(data.error || data.errore || 'Errore durante il calcolo.');
+  }
+  return data;
+}
+
+async function computeY() {
+  const output = document.getElementById('output');
+  const icon = document.getElementById('computeYIcon');
+  const btn = document.getElementById('computeYBtn');
+  const { domain, payload, inputLatex } = collectSystemPayload();
+  const endpoint = domain === 'R' ? '/api/forced-output' : '/api/forced-output-z';
+
+  icon.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>';
+  btn.disabled = true;
+  output.innerHTML = '<div class="sd-loader text-center my-2"><div class="spinner-border text-primary"></div></div>';
+
+  try {
+    const res = await callEndpoint(endpoint, payload);
+    renderResult('Sistema inserito:', inputLatex, res, 'Sistemi Dinamici - Uscita');
+  } catch (err) {
+    output.innerHTML = createErrorAlert(err.message);
+  } finally {
+    btn.disabled = false;
+    icon.innerHTML = '<i class="fas fa-play me-2"></i>';
+  }
+}
+
+async function computeX() {
+  const domain = document.getElementById('domainSelect').value;
+  const output = document.getElementById('output');
+  const icon = document.getElementById('computeXIcon');
+  const btn = document.getElementById('computeXBtn');
+
+  if (domain !== 'R') {
+    output.innerHTML = createErrorAlert('Calcolo dello stato disponibile solo per T = R.');
+    btn.disabled = false;
+    return;
+  }
+
+  const { payload, inputLatex } = collectSystemPayload();
+  icon.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>';
+  output.innerHTML = '<div class="sd-loader text-center my-2"><div class="spinner-border text-primary"></div></div>';
+  btn.disabled = true;
+
+  try {
+    const res = await callEndpoint('/api/forced-state', payload);
+    renderResult('Sistema inserito:', inputLatex, res, 'Sistemi Dinamici - Stato');
+  } catch (err) {
+    output.innerHTML = createErrorAlert(err.message);
+  } finally {
+    btn.disabled = false;
+    icon.innerHTML = '<i class="fas fa-play me-2"></i>';
+  }
+}
+
+function resetSistemaDinamico() {
+  refreshSystemFields();
+  document.getElementById('domainSelect').value = 'R';
+  updateDomainLabels();
+  document.getElementById('UField').setValue('u(t)=\\placeholder[uexpr]{0}');
+  document.getElementById('output').innerHTML =
+    '<div class="empty-state text-center text-muted py-5">' +
+      '<i class="fas fa-sliders-h fa-3x mb-3 opacity-50"></i>' +
+      '<h6>Pronto</h6>' +
+      '<p class="small">Configura il sistema e scegli “Calcola \\(y(t)\\)” o “Calcola \\(x(t)\\)”.</p>' +
+    '</div>';
+}
+
+function typesetInputMath() {
+  if (window.MathJax?.typesetPromise) {
+    const inputCard = document.querySelector('.calculator-card');
+    if (inputCard) MathJax.typesetPromise([inputCard]);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const domainSelect = document.getElementById('domainSelect');
+  const sizeSelect = document.getElementById('systemSizeSelect');
+  const descrCollapse = document.getElementById('descrizioneSistemi');
+  const descrText = document.getElementById('descrizioneText');
+  const descrIcon = document.getElementById('descrizioneIcon');
+
+  sizeSelect.addEventListener('change', refreshSystemFields);
+  domainSelect.addEventListener('change', updateDomainLabels);
+
+  descrCollapse.addEventListener('hide.bs.collapse', () => {
+    descrText.textContent = 'Mostra descrizione';
+    descrIcon.classList.remove('fa-chevron-up');
+    descrIcon.classList.add('fa-chevron-down');
+  });
+  descrCollapse.addEventListener('show.bs.collapse', () => {
+    descrText.textContent = 'Nascondi descrizione';
+    descrIcon.classList.remove('fa-chevron-down');
+    descrIcon.classList.add('fa-chevron-up');
+  });
+
+  refreshSystemFields();
+  updateDomainLabels();
+  typesetInputMath();
+});
+</script>
+
+<script src="/js/anti-autoscroll.js"></script>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/mathlive@0.92.0/dist/mathlive.min.js"></script>
+  <script src="/js/layout-state.js"></script>
+  <script src="/js/site-i18n.js"></script>
+  <script src="/js/math-render-cache.js"></script>
+  <script src="/js/component-loader.js"></script>
+</body>
+</html>

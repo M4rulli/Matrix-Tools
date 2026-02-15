@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="it" data-page-title="Sistemi Lineari">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sistemi Lineari - Matrix Tools</title>
+  <link rel="icon" href="/assets/icons/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/svg+xml" href="/assets/icons/favicon.svg" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png" />
+  <link rel="manifest" href="/assets/icons/site.webmanifest" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/mathlive/dist/mathlive-static.css" />
+  <link href="/css/style.css" rel="stylesheet" />
+  <link href="/css/panels-theme.css" rel="stylesheet" />
+  
+</head>
+<body>
+  <div id="navbar"></div>
+
+  <div class="container-fluid" style="margin-top: 100px; padding: 0rem 1.5rem 0rem 0rem !important;">
+    <!-- MathJax -->
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<!-- MathLive -->
+<link rel="stylesheet" href="https://unpkg.com/mathlive/dist/mathlive.core.css">
+<script src="https://unpkg.com/mathlive/dist/mathlive.min.js"></script>
+
+<div class="row">
+  <!-- ========= INPUT CARD ========= -->
+  <div class="col-12 mb-4">
+    <div class="card calculator-card shadow-sm">
+      <div class="card-header bg-primary text-white">
+        <h5 class="card-title mb-0">
+          <i class="fas fa-edit me-2"></i>Input
+        </h5>
+      </div>
+      <div class="card-body">
+        <!-- ◆◆ Description (Show/Hide) ◆◆ -->
+
+        <div class="mb-3">
+          <button id="toggleDescrizione"
+                  class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#descrizioneSystem"
+                  aria-expanded="false"
+                  aria-controls="descrizioneSystem">
+            <i class="fas fa-chevron-down rotate-icon transition" id="descrizioneIcon"></i>
+            <span id="descrizioneText">Mostra descrizione</span>
+          </button>
+        </div>
+        <div class="collapse mb-3" id="descrizioneSystem">
+          <div class="card card-body bg-light border mt-2">
+            <p class="text-muted">
+              Un <em>sistema lineare</em> di \(n\) equazioni in \(n\) incognite è espresso in forma matriciale \(A\mathbf{x}=\mathbf{b}\), con \(A\in\mathbb{R}^{n\times n}\) e \(\mathbf{b}\in\mathbb{R}^{n}\).  
+              Mediante l’eliminazione di Gauss (con eventuale pivoting) si determina il rango di \(A\) e della matrice aumentata \(\bigl[A\,|\,\mathbf{b}\bigr]\).
+
+              Il <strong>teorema di Rouch&eacute;–Capelli</strong> garantisce la compatibilità del sistema se e solo se:
+              \[
+                \operatorname{rank}(A)=\operatorname{rank}\bigl[A\,|\,\mathbf{b}\bigr].
+              \]
+
+              Nel caso compatibile, il numero di soluzioni è:
+              \[
+                \#\text{Soluzioni} \;=\;
+                \begin{cases}
+                  1, & \text{se }\operatorname{rank}(A)=n,\\[4pt]
+                  \infty^{\,n-\operatorname{rank}(A)}, & \text{se }\operatorname{rank}(A)&lt;n.
+                \end{cases}
+              \]
+            </p>
+          </div>
+        </div>
+
+        <!-- ◆◆ Dimension selector ◆◆ -->
+        <div class="mb-3">
+          <label for="dimensionSelect" class="form-label fw-semibold">
+            Dimensione sistema:
+          </label>
+          <select id="dimensionSelect" class="form-select form-select-sm w-auto" onchange="updateSystemField()">
+            <option value="2" selected>2 equazioni</option>
+            <option value="3">3 equazioni</option>
+            <option value="4">4 equazioni</option>
+          </select>
+        </div>
+
+        <!-- ◆◆ MathLive system field ◆◆ -->
+        <div class="mb-3">
+          <label for="systemField" class="form-label fw-semibold">
+            Inserisci il sistema:
+          </label>
+          <math-field id="systemField"
+                      delete-mode="off"
+                      default-mode="math"
+                      read-only="partial"
+                      class="math-input"
+                      style="font-size: 22px;">
+          </math-field>
+        </div>
+    <div class="form-text mb-3" style="font-size: 0.85rem; margin-top: 10px;">
+          Inserisci numeri interi o frazioni. Puoi lasciare un coefficiente simbolico <code>k</code> per
+          parametrizzare il sistema e studiarne la compatibilità al variare di \(k\).  
+          Le variabili ammesse sono \(x, y, z, w\).
+        </div>
+
+        <!-- ◆◆ Buttons ◆◆ -->
+        <div class="text-center mt-3">
+          <button id="solveButton" onclick="computeSystem()" class="btn btn-primary btn-sm px-3">
+            <i class="fas fa-play me-2"></i>Risolvi
+          </button>
+          <button onclick="resetSystem()" class="btn btn-secondary btn-sm px-3 ms-1">
+            <i class="fas fa-eraser me-2"></i>Pulisci
+          </button>
+        </div>
+      </div><!-- /.card-body -->
+    </div><!-- /.card -->
+  </div><!-- /.col -->
+
+  <!-- ========= OUTPUT CARD ========= -->
+  <div class="col-12">
+    <div class="card output-card shadow-sm">
+      <div class="card-header bg-success text-white">
+        <h5 class="card-title mb-0">
+          <i class="fas fa-chart-line me-2"></i>Output
+        </h5>
+      </div>
+      <div class="card-body" id="output">
+        <div class="empty-state text-center text-muted py-5">
+          <i class="fas fa-calculator fa-3x mb-3 opacity-50"></i>
+          <h6>Pronto per calcolare</h6>
+          <p class="small">Seleziona la dimensione, inserisci il sistema e premi "Risolvi".</p>
+        </div>
+      </div>
+    </div>
+  </div><!-- /.col -->
+</div><!-- /.row -->
+
+<!-- ==================  SCRIPTS  ================== -->
+<script>
+/* --------------- Utilities --------------- */
+function placeholderKey(i, j) {
+  return 'c' + i + j; // left/right placeholders
+}
+
+function buildSystemLatex(n) {
+  let rows = [];
+  for (let i = 1; i <= n; i++) {
+    const leftPH  = '\\placeholder[' + placeholderKey(i, 1) + ']{}';
+    const rightPH = '\\placeholder[' + placeholderKey(i, 2) + ']{}';
+    rows.push(leftPH + ' =&\\; ' + rightPH);
+  }
+  return '\\begin{cases} ' + rows.join(' \\\\ ') + ' \\end{cases}';
+}
+
+function readSystem(n) {
+  const field = window.systemField;
+  let equations = [];
+  for (let i = 1; i <= n; i++) {
+    const lhs = field.getPromptValue(placeholderKey(i, 1))?.trim();
+    const rhs = field.getPromptValue(placeholderKey(i, 2))?.trim();
+    if (!lhs || !rhs) return null;
+    equations.push([lhs, rhs]); // store as [expression, rhs]
+  }
+  return equations;
+}
+
+/* --------------- UI helpers --------------- */
+function updateSystemField() {
+  const n = parseInt(document.getElementById('dimensionSelect').value, 10);
+  window.systemField.setValue(buildSystemLatex(n));
+}
+
+function resetSystem() {
+  updateSystemField();
+  const output = document.getElementById('output');
+  output.innerHTML = `
+    <div class="empty-state text-center text-muted py-5">
+      <i class="fas fa-calculator fa-3x mb-3 opacity-50"></i>
+      <h6>Pronto per calcolare</h6>
+      <p class="small">Seleziona la dimensione, inserisci il sistema e premi "Risolvi".</p>
+    </div>`;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  window.systemField = document.getElementById('systemField');
+  resetSystem();
+
+  const descrizioneCollapse = document.getElementById('descrizioneSystem');
+  const descrizioneText = document.getElementById('descrizioneText');
+  const descrizioneIcon = document.getElementById('descrizioneIcon');
+  descrizioneCollapse.addEventListener('hide.bs.collapse', () => {
+    descrizioneText.textContent = 'Mostra descrizione';
+    descrizioneIcon.classList.remove('fa-chevron-up');
+    descrizioneIcon.classList.add('fa-chevron-down');
+  });
+  descrizioneCollapse.addEventListener('show.bs.collapse', () => {
+    descrizioneText.textContent = 'Nascondi descrizione';
+    descrizioneIcon.classList.remove('fa-chevron-down');
+    descrizioneIcon.classList.add('fa-chevron-up');
+  });
+});
+
+/* --------------- API Call --------------- */
+function computeSystem() {
+  const n = parseInt(document.getElementById('dimensionSelect').value, 10);
+  const equations = readSystem(n);
+  const output = document.getElementById('output');
+
+  if (!equations) {
+    output.innerHTML = '<div class="alert alert-danger">Inserisci tutti i coefficienti e termini noti.</div>';
+    MathJax.typesetPromise([output]);
+    return;
+  }
+
+  const btn = document.getElementById('solveButton');
+  const originalHTML = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Calcolo...';
+  output.innerHTML = '<div class="text-center my-3"><div class="spinner-border text-primary"></div></div>';
+  output.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  fetch('/api/linear-systems', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ n, equations })
+  })
+  .then(r => r.json())
+  .then(res => {
+    btn.disabled = false;
+    btn.innerHTML = originalHTML;
+    if (!res.success) {
+      output.innerHTML = `<div class="alert alert-danger">${res.error}</div>`;
+    } else {
+      const stepsArray = Array.isArray(res.steps) ? res.steps : [];
+      if (stepsArray.length === 0) {
+        output.innerHTML = '<div class="alert alert-warning">Nessun passo disponibile.</div>';
+      } else {
+        let latex = '';
+        const container = document.createElement('div');
+        stepsArray.forEach((step, i) => {
+          container.insertAdjacentHTML('beforeend',
+            `<p class="step-title"><b>${i})</b> ${step.title || ''}</p>
+             <p class="centered-math">\\[${step.content}\\]</p>`
+          );
+          latex += `${i}) ${step.title || ''}\n\\[${step.content}\\]\n`;
+        });
+
+        // Notebook integration
+        const notebookPayload = {
+          title: 'Sistemi Lineari',
+          algorithm: 'Risoluzione sistema lineare',
+          input: JSON.stringify(equations),
+          htmlOutput: container.outerHTML,
+          outputLatex: latex,
+          rawData: res
+        };
+        const saveDiv = document.createElement('div');
+        saveDiv.id = 'systemNotebookButton';
+        saveDiv.classList.add('mt-3');
+        container.appendChild(saveDiv);
+        if (typeof window.injectSaveButton === 'function') {
+          window.injectSaveButton(saveDiv, notebookPayload);
+        }
+
+        output.dataset.latex = latex;
+        output.innerHTML = '';
+        const wrapper = document.createElement('div');
+        wrapper.className = 'result-section';
+        wrapper.appendChild(container);
+        output.appendChild(wrapper);
+
+        MathJax.typesetPromise([output]);
+      }
+    }
+  })
+  .catch(err => {
+    btn.disabled = false;
+    btn.innerHTML = originalHTML;
+    output.innerHTML = `<div class="alert alert-danger">${err.message}</div>`;
+  });
+}
+</script>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/mathlive@0.92.0/dist/mathlive.min.js"></script>
+  <script src="/js/layout-state.js"></script>
+  <script src="/js/site-i18n.js"></script>
+  <script src="/js/math-render-cache.js"></script>
+  <script src="/js/component-loader.js"></script>
+</body>
+</html>
